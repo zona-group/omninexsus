@@ -4,22 +4,26 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_babel import Babel
+from flask_mail import Mail
 from authlib.integrations.flask_client import OAuth
+from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-db = SQLAlchemy()
+db           = SQLAlchemy()
 login_manager = LoginManager()
-babel = Babel()
-oauth = OAuth()
+babel        = Babel()
+oauth        = OAuth()
+mail         = Mail()
+
 
 def create_app():
     app = Flask(__name__)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app.config.from_object(Config)
 
-    # Log which DB URL is being used (mask password)
     db_url = app.config.get('SQLALCHEMY_DATABASE_URI', '')
     import re
     masked = re.sub(r'://([^:]+):([^@]+)@', r'://\1:***@', db_url)
@@ -29,11 +33,12 @@ def create_app():
     login_manager.init_app(app)
     babel.init_app(app)
     oauth.init_app(app)
+    mail.init_app(app)
 
-    login_manager.login_view = 'auth.login'
-    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_view    = 'auth.login'
+    login_manager.login_message = 'Lutfen giris yapin.'
 
-    # Register Google OAuth if credentials are configured
+    # Google OAuth
     if app.config.get('GOOGLE_CLIENT_ID') and app.config.get('GOOGLE_CLIENT_SECRET'):
         oauth.register(
             name='google',
@@ -43,25 +48,26 @@ def create_app():
             client_kwargs={'scope': 'openid email profile'},
         )
         logger.info("[OmniNexus] Google OAuth configured.")
-    else:
-        logger.info("[OmniNexus] Google OAuth not configured (GOOGLE_CLIENT_ID/SECRET missing).")
 
-    from routes.main import main as main_bp
-    from routes.auth import auth as auth_bp
-    from routes.news import news as news_bp
+    from routes.main     import main     as main_bp
+    from routes.auth     import auth     as auth_bp
+    from routes.news     import news     as news_bp
     from routes.comments import comments as comments_bp
+    from routes.admin    import admin_bp
+    from routes.push     import push_bp
 
     app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(news_bp, url_prefix='/news')
+    app.register_blueprint(auth_bp,     url_prefix='/auth')
+    app.register_blueprint(news_bp,     url_prefix='/news')
     app.register_blueprint(comments_bp, url_prefix='/comments')
+    app.register_blueprint(admin_bp,    url_prefix='/admin')
+    app.register_blueprint(push_bp,     url_prefix='/push')
 
     with app.app_context():
         try:
             db.create_all()
-            # Add new columns if they don't exist (migration-safe)
             _safe_migrate(db)
-            logger.info("[OmniNexus] Database tables created/verified successfully.")
+            logger.info("[OmniNexus] Database ready.")
         except Exception as e:
             logger.error(f"[OmniNexus] DB init failed: {e}")
 
@@ -69,36 +75,25 @@ def create_app():
 
 
 def _safe_migrate(db):
-    """Add new columns to existing tables without breaking existing data."""
     try:
         with db.engine.connect() as conn:
-            # Add google_id column if missing
-            try:
-                conn.execute(db.text(
-                    "ALTER TABLE users ADD COLUMN google_id VARCHAR(128) UL¢ÑUQUUCHUNE NULL"
-                ))
-                conn.commit()
-                logger.info("[OmniNexus] Added google_id column to users table.")
-            except Exception:
-                pass  # Column already exists
-            # Make password_hash nullable if not already
-            try:
-                conn.execute(db.text(
-                    "ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(256) NULL"
-                ))
-                conn.commit()
-            except Exception:
-                pass
-            # Extend avatar column
-            try:
-                conn.execute(db.text(
-                    "ALTER TABLE users MODIFY COLUMN avatar VARCHAR(500) NULL DEFAULT ''"
-                ))
-                conn.commit()
-            except Exception:
-                pass
+            migrations = [
+                "ALTER TABLE users ADD COLUMN google_id VARCHAR(128) UNIQUE NULL",
+                "ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(256) NULL",
+                "ALTER TABLE users MODIFY COLUMN avatar VARCHAR(500) NULL DEFAULT ''",
+                "ALTER TABLE users ADD COLUMN email_verified TINYINT(1) NOT NULL DEFAULT 0",
+                "ALTER TABLE users ADD COLUMN verification_token VARCHAR(128) NULL",
+                "ALTER TABLE users MODIFY COLUMN is_active TINYINT(1) NOT NULL DEFAULT 0",
+                "CREATE UNIQUE INDEX uq_verification_token ON users(verification_token)",
+            ]
+            for sql in migrations:
+                try:
+                    conn.execute(db.text(sql))
+                    conn.commit()
+                except Exception:
+                    pass
     except Exception as e:
-            logger.warning(f"[OmniNexus] Migration warning: {e}")
+        logger.warning(f"[OmniNexus] Migration warning: {e}")
 
 
 if __name__ == '__main__':
