@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — OmniNexus</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <a class="brand-link" href="/">OmniNexus</a>
+    <h1>Create Account</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="form-error">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+    <form method="POST" action="/auth/register">
+      <input name="username" type="text" placeholder="Username" required />
+      <input name="email" type="email" placeholder="Email" required />
+      <input name="password" type="password" placeholder="Password" required />
+      <button class="btn btn-primary full-w" type="submit">Sign Up</button>
+    </form>
+    <p class="switch-auth">Have account? <a href="/auth/login">Login</a></p>
+  </div>
+</body>
+</html>
