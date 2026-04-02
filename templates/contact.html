@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080c14" />
+  <meta name="description" content="Contact OmniNexus — Reach us for general inquiries, partnerships, and collaboration." />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32.png" />
+  <title>Contact — OmniNexus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a class="nav-brand" href="/">
+    <div class="brand-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" width="28" height="28">
+        <defs>
+          <linearGradient id="gM" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366f1"/>
+            <stop offset="50%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#22d3ee"/>
+          </linearGradient>
+          <radialGradient id="gC" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#22d3ee"/>
+            <stop offset="100%" stop-color="#6366f1" stop-opacity="0.8"/>
+          </radialGradient>
+        </defs>
+        <line x1="100" y1="100" x2="100" y2="38"  stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="100" y1="100" x2="156" y2="62"  stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="100" y1="100" x2="156" y2="138" stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="100" y1="100" x2="100" y2="162" stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="100" y1="100" x2="44"  y2="138" stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
+        <line x1="100" y1="100" x2="44"  y2="62"  stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
+        <circle cx="100" cy="100" r="18" fill="#0d1424" stroke="url(#gM)" stroke-width="2"/>
+        <circle cx="100" cy="100" r="14" fill="url(#gC)"/>
+        <text x="100" y="106" font-family="Arial Black,sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="white">N</text>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">OmniNexus</div>
+      <div class="brand-tag">Live · Global</div>
+    </div>
+  </a>
+  <div class="nav-right">
+    {% if user and user.is_authenticated %}
+      <div class="nav-username">
+        <div class="avatar-dot">{{ user.username[0].upper() }}</div>
+        <span>{{ user.username }}</span>
+      </div>
+      <a href="/auth/logout" class="btn btn-sm">Logout</a>
+    {% else %}
+      <a href="/" class="btn btn-sm">← Back to News</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- CONTACT PAGE -->
+<div class="contact-page">
+  <div class="contact-hero">
+    <div class="contact-hero-glow"></div>
+    <h1 class="contact-title">Get in Touch</h1>
+    <p class="contact-subtitle">We'd love to hear from you. Reach out in English or Turkish — we're here to help.</p>
+  </div>
+
+  <div class="contact-grid">
+
+    <!-- General / Info -->
+    <div class="contact-card">
+      <div class="contact-card-icon">📬</div>
+      <h3>General Inquiries / Genel Sorular</h3>
+      <p>For general questions, feedback, and support.</p>
+      <a href="mailto:info@omninexsus.com" class="contact-email-btn">
+        info@omninexsus.com
+      </a>
+    </div>
+
+    <!-- Contact TR -->
+    <div class="contact-card">
+      <div class="contact-card-icon">🇹🇷</div>
+      <h3>Türkçe İletişim</h3>
+      <p>Türkçe sorular, öneriler ve geri bildirimler için.</p>
+      <a href="mailto:iletisim@omninexsus.com" class="contact-email-btn">
+        iletisim@omninexsus.com
+      </a>
+    </div>
+
+    <!-- Contact EN -->
+    <div class="contact-card">
+      <div class="contact-card-icon">🌍</div>
+      <h3>English Contact</h3>
+      <p>For English-language inquiries, press, and media requests.</p>
+      <a href="mailto:contact@omninexsus.com" class="contact-email-btn">
+        contact@omninexsus.com
+      </a>
+    </div>
+
+    <!-- Partnership TR -->
+    <div class="contact-card contact-card-accent">
+      <div class="contact-card-icon">🤝</div>
+      <h3>İş Birliği</h3>
+      <p>Ortaklık teklifleri, içerik iş birlikleri ve sponsorluk için.</p>
+      <a href="mailto:isbirligi@omninexsus.com" class="contact-email-btn contact-email-btn-accent">
+        isbirligi@omninexsus.com
+      </a>
+    </div>
+
+    <!-- Partnership EN -->
+    <div class="contact-card contact-card-accent">
+      <div class="contact-card-icon">🚀</div>
+      <h3>Partnerships</h3>
+      <p>Business partnerships, advertising, and sponsorship opportunities.</p>
+      <a href="mailto:partnership@omninexsus.com" class="contact-email-btn contact-email-btn-accent">
+        partnership@omninexsus.com
+      </a>
+    </div>
+
+  </div>
+
+  <div class="contact-note">
+    <p>We typically respond within <strong>24–48 hours</strong>. For urgent matters, please mention it in the subject line.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo-wrap">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact – OmniNexus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <style>
+    :root {
+      --bg: #080c14;
+      --surface: #0f1623;
+      --border: rgba(99,102,241,.18);
+      --primary: #6366f1;
+      --accent: #22d3ee;
+      --purple: #a855f7;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+    /* Navbar */
+    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; border-bottom: 1px solid var(--border); background: rgba(8,12,20,.85); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+    .navbar-brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
+    .navbar-brand svg { width: 32px; height: 32px; }
+    .navbar-brand-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 1.15rem; background: linear-gradient(135deg, #6366f1, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .navbar-links { display: flex; align-items: center; gap: 1.5rem; }
+    .navbar-links a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .2s; }
+    .navbar-links a:hover { color: var(--text); }
+    .btn-nav { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff !important; padding: .45rem 1.1rem; border-radius: 8px; font-weight: 600; font-size: .85rem !important; }
+    /* Contact hero */
+    .contact-page { padding: 4rem 1.5rem 5rem; max-width: 900px; margin: 0 auto; }
+    .contact-hero { text-align: center; margin-bottom: 3.5rem; position: relative; }
+    .contact-hero-glow { position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 500px; height: 300px; background: radial-gradient(ellipse at center, rgba(99,102,241,.25) 0%, transparent 70%); pointer-events: none; }
+    .contact-title { font-family: 'Manrope', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; background: linear-gradient(135deg, #fff 30%, #6366f1 70%, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; position: relative; }
+    .contact-subtitle { color: var(--muted); font-size: 1.1rem; max-width: 500px; margin: 0 auto; }
+    /* Cards grid */
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+    .contact-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; transition: transform .2s, border-color .2s, box-shadow .2s; position: relative; overflow: hidden; }
+    .contact-card::before { content: ''; position: absolute; inset: 0; border-radius: 16px; opacity: 0; transition: opacity .2s; }
+    .contact-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 8px 32px rgba(99,102,241,.18); }
+    .contact-card-accent { border-color: rgba(34,211,238,.25); }
+    .contact-card-accent:hover { border-color: var(--accent); box-shadow: 0 8px 32px rgba(34,211,238,.15); }
+    .contact-card-icon { font-size: 2rem; }
+    .contact-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+    .contact-card p { color: var(--muted); font-size: .88rem; flex: 1; }
+    .contact-email-btn { display: inline-flex; align-items: center; gap: .4rem; background: linear-gradient(135deg, rgba(99,102,241,.15), rgba(99,102,241,.08)); border: 1px solid rgba(99,102,241,.3); color: var(--primary); text-decoration: none; padding: .55rem 1rem; border-radius: 8px; font-size: .85rem; font-weight: 600; transition: background .2s, border-color .2s; }
+    .contact-email-btn:hover { background: linear-gradient(135deg, rgba(99,102,241,.3), rgba(99,102,241,.15)); border-color: var(--primary); }
+    .contact-email-btn-accent { background: linear-gradient(135deg, rgba(34,211,238,.15), rgba(34,211,238,.08)); border-color: rgba(34,211,238,.3); color: var(--accent); }
+    .contact-email-btn-accent:hover { background: linear-gradient(135deg, rgba(34,211,238,.3), rgba(34,211,238,.15)); border-color: var(--accent); }
+    .contact-note { text-align: center; margin-top: 3rem; color: var(--muted); font-size: .9rem; }
+    /* Footer */
+    .site-footer { background: var(--surface); border-top: 1px solid var(--border); padding: 3rem 2rem 1.5rem; margin-top: 4rem; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+    .footer-logo-wrap { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; }
+    .footer-brand-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 1.1rem; background: linear-gradient(135deg, #6366f1, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .footer-desc { color: var(--muted); font-size: .85rem; line-height: 1.6; max-width: 240px; }
+    .footer-col-title { color: var(--text); font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .75rem; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: .85rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-bottom { max-width: 1100px; margin: 0 auto; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; align-items: center; gap: .75rem; color: var(--muted); font-size: .82rem; }
+    .footer-bottom a { color: var(--muted); text-decoration: none; }
+    .footer-bottom a:hover { color: var(--accent); }
+    .footer-sep { opacity: .4; }
+    @media (max-width: 700px) { .footer-inner { grid-template-columns: 1fr 1fr; } .navbar-links { display: none; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18" stroke="url(#ng)" stroke-width="2"/>
+        <path d="M12 20 Q20 10 28 20 Q20 30 12 20Z" fill="url(#ng2)" opacity=".9"/>
+        <circle cx="20" cy="20" r="3" fill="#22d3ee"/>
+        <defs>
+          <linearGradient id="ng" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6366f1"/><stop offset="1" stop-color="#22d3ee"/>
+          </linearGradient>
+          <linearGradient id="ng2" x1="12" y1="20" x2="28" y2="20" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6366f1"/><stop offset="1" stop-color="#22d3ee"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span class="navbar-brand-name">OmniNexus</span>
+    </a>
+    <div class="navbar-links">
+      <a href="/">Home</a>
+      <a href="/contact">Contact</a>
+      {% if user and user.is_authenticated %}
+        <a href="/auth/logout">Logout</a>
+      {% else %}
+        <a href="/auth/login" class="btn-nav">Sign In</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="contact-page">
+    <div class="contact-hero">
+      <div class="contact-hero-glow"></div>
+      <h1 class="contact-title">Get in Touch</h1>
+      <p class="contact-subtitle">Have a question, a partnership idea, or just want to say hello? We'd love to hear from you.</p>
+    </div>
+
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-card-icon">📬</div>
+        <h3>General Inquiries</h3>
+        <p>For general questions, feedback, and support about OmniNexus.</p>
+        <a href="mailto:info@omninexsus.com" class="contact-email-btn">✉️ info@omninexsus.com</a>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-icon">🇹🇷</div>
+        <h3>Türkçe İletişim</h3>
+        <p>Türkçe sorularınız ve geri bildirimleriniz için bize yazın.</p>
+        <a href="mailto:iletisim@omninexsus.com" class="contact-email-btn">✉️ iletisim@omninexsus.com</a>
+      </div>
+
+      <div class="contact-card contact-card-accent">
+        <div class="contact-card-icon">🌍</div>
+        <h3>English Contact</h3>
+        <p>Reach out in English for all international inquiries and support.</p>
+        <a href="mailto:contact@omninexsus.com" class="contact-email-btn contact-email-btn-accent">✉️ contact@omninexsus.com</a>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-icon">🤝</div>
+        <h3>İş Birliği / Partnerships</h3>
+        <p>Ortaklık ve iş birliği teklifleri için bizimle iletişime geçin.</p>
+        <a href="mailto:isbirligi@omninexsus.com" class="contact-email-btn">✉️ isbirligi@omninexsus.com</a>
+      </div>
+
+      <div class="contact-card contact-card-accent">
+        <div class="contact-card-icon">🚀</div>
+        <h3>Global Partnerships</h3>
+        <p>International partnership proposals and business development inquiries.</p>
+        <a href="mailto:partnership@omninexsus.com" class="contact-email-btn contact-email-btn-accent">✉️ partnership@omninexsus.com</a>
+      </div>
+    </div>
+
+    <p class="contact-note">We aim to respond to all inquiries within 24–48 hours. · Tüm mesajlara 24–48 saat içinde yanıt vermeye çalışıyoruz.</p>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <svg width="26" height="26" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="url(#fg)" stroke-width="2"/><path d="M12 20 Q20 10 28 20 Q20 30 12 20Z" fill="url(#fg2)" opacity=".9"/><circle cx="20" cy="20" r="3" fill="#22d3ee"/><defs><linearGradient id="fg" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#22d3ee"/></linearGradient><linearGradient id="fg2" x1="12" y1="20" x2="28" y2="20" gradientUnits="userSpaceOnUse"><stop stop-color="#6366f1"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs></svg>
+          <span class="footer-brand-name">OmniNexus</span>
+        </div>
+        <p class="footer-desc">Real-time global headlines in your language. Powered by AI, built for the world.</p>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Navigate</h4>
+        <ul class="footer-links">
+          <li><a href="/">🏠 Home</a></li>
+          <li><a href="/contact">✉️ Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Contact</h4>
+        <ul class="footer-links">
+          <li><a href="mailto:info@omninexsus.com">info@omninexsus.com</a></li>
+          <li><a href="mailto:iletisim@omninexsus.com">iletisim@omninexsus.com</a></li>
+          <li><a href="mailto:contact@omninexsus.com">contact@omninexsus.com</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="footer-col-title">Partnerships</h4>
+        <ul class="footer-links">
+          <li><a href="mailto:isbirligi@omninexsus.com">isbirligi@omninexsus.com</a></li>
+          <li><a href="mailto:partnership@omninexsus.com">partnership@omninexsus.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 OmniNexus. All rights reserved.</span>
+      <span class="footer-sep">·</span>
+      <a href="/contact">Contact</a>
+    </div>
+  </footer>
+</body>
+</html>
