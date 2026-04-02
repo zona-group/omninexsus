@@ -10,6 +10,11 @@ def index():
     return render_template('index.html', user=current_user, config=current_app.config)
 
 
+@main.route('/contact')
+def contact():
+    return render_template('contact.html', user=current_user, config=current_app.config)
+
+
 @main.route('/translate', methods=['POST'])
 def translate():
     data = request.get_json()
