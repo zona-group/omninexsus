@@ -38,25 +38,21 @@
           <filter id="gl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
           <filter id="cgl"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <!-- Lines: center to outer -->
         <line x1="100" y1="100" x2="100" y2="38"  stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
         <line x1="100" y1="100" x2="156" y2="62"  stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
         <line x1="100" y1="100" x2="156" y2="138" stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
         <line x1="100" y1="100" x2="100" y2="162" stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
         <line x1="100" y1="100" x2="44"  y2="138" stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
         <line x1="100" y1="100" x2="44"  y2="62"  stroke="url(#gM)" stroke-width="1.5" opacity="0.6"/>
-        <!-- Outer hex ring -->
         <line x1="100" y1="38"  x2="156" y2="62"  stroke="#6366f1" stroke-width="0.9" opacity="0.4"/>
         <line x1="156" y1="62"  x2="156" y2="138" stroke="#6366f1" stroke-width="0.9" opacity="0.4"/>
         <line x1="156" y1="138" x2="100" y2="162" stroke="#6366f1" stroke-width="0.9" opacity="0.4"/>
         <line x1="100" y1="162" x2="44"  y2="138" stroke="#6366f1" stroke-width="0.9" opacity="0.4"/>
         <line x1="44"  y1="138" x2="44"  y2="62"  stroke="#6366f1" stroke-width="0.9" opacity="0.4"/>
         <line x1="44"  y1="62"  x2="100" y2="38"  stroke="#6366f1" stroke-width="0.9" opacity="0.4"/>
-        <!-- Cross-links -->
         <line x1="100" y1="38"  x2="156" y2="138" stroke="#a855f7" stroke-width="0.6" opacity="0.2"/>
         <line x1="156" y1="62"  x2="44"  y2="138" stroke="#a855f7" stroke-width="0.6" opacity="0.2"/>
         <line x1="156" y1="138" x2="44"  y2="62"  stroke="#a855f7" stroke-width="0.6" opacity="0.2"/>
-        <!-- Outer nodes -->
         <circle cx="100" cy="38"  r="9" fill="#0d1424" stroke="url(#gM)" stroke-width="1.5" filter="url(#gl)"/>
         <circle cx="100" cy="38"  r="5" fill="url(#gN)"/>
         <circle cx="156" cy="62"  r="9" fill="#0d1424" stroke="url(#gM)" stroke-width="1.5" filter="url(#gl)"/>
@@ -69,10 +65,8 @@
         <circle cx="44"  cy="138" r="5" fill="url(#gN)"/>
         <circle cx="44"  cy="62"  r="9" fill="#0d1424" stroke="url(#gM)" stroke-width="1.5" filter="url(#gl)"/>
         <circle cx="44"  cy="62"  r="5" fill="url(#gN)"/>
-        <!-- Center pulse rings -->
         <circle cx="100" cy="100" r="28" fill="none" stroke="#6366f1" stroke-width="1" opacity="0.25"/>
         <circle cx="100" cy="100" r="22" fill="none" stroke="#a855f7" stroke-width="1" opacity="0.35"/>
-        <!-- Center node -->
         <circle cx="100" cy="100" r="18" fill="#0d1424" stroke="url(#gM)" stroke-width="2" filter="url(#cgl)"/>
         <circle cx="100" cy="100" r="14" fill="url(#gC)"/>
         <text x="100" y="106" font-family="Arial Black,sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="white">N</text>
@@ -127,7 +121,6 @@
     <span class="ticker-sep">◆</span>
     <span class="ticker-item">Global GDP growth surpasses 4% forecast</span>
     <span class="ticker-sep">◆</span>
-    <!-- duplicate for seamless loop -->
     <span class="ticker-item">Markets reach all-time high amid AI boom</span>
     <span class="ticker-sep">◆</span>
     <span class="ticker-item">New climate accord signed by 120 nations</span>
@@ -156,54 +149,18 @@
 
 <!-- MAIN CONTENT -->
 <div class="page-wrap">
-
-  <!-- HERO SECTION -->
   <section class="hero-section">
-    <div id="heroSlot"><!-- injected by JS --></div>
+    <div id="heroSlot"></div>
   </section>
-
-  <!-- NEWS GRID -->
   <div class="section-header">
     <span class="section-title" id="sectionTitle">Latest Headlines</span>
     <div class="section-line"></div>
   </div>
   <div id="newsGrid" class="news-grid">
-    <!-- skeleton placeholders -->
-    <div class="skeleton-card">
-      <div class="skeleton skeleton-img"></div>
-      <div class="skeleton-body">
-        <div class="skeleton skeleton-src"></div>
-        <div class="skeleton skeleton-t1"></div>
-        <div class="skeleton skeleton-t2"></div>
-        <div class="skeleton skeleton-d1"></div>
-        <div class="skeleton skeleton-d2"></div>
-        <div class="skeleton skeleton-ft"></div>
-      </div>
-    </div>
-    <div class="skeleton-card">
-      <div class="skeleton skeleton-img"></div>
-      <div class="skeleton-body">
-        <div class="skeleton skeleton-src"></div>
-        <div class="skeleton skeleton-t1"></div>
-        <div class="skeleton skeleton-t2"></div>
-        <div class="skeleton skeleton-d1"></div>
-        <div class="skeleton skeleton-d2"></div>
-        <div class="skeleton skeleton-ft"></div>
-      </div>
-    </div>
-    <div class="skeleton-card">
-      <div class="skeleton skeleton-img"></div>
-      <div class="skeleton-body">
-        <div class="skeleton skeleton-src"></div>
-        <div class="skeleton skeleton-t1"></div>
-        <div class="skeleton skeleton-t2"></div>
-        <div class="skeleton skeleton-d1"></div>
-        <div class="skeleton skeleton-d2"></div>
-        <div class="skeleton skeleton-ft"></div>
-      </div>
-    </div>
+    <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-src"></div><div class="skeleton skeleton-t1"></div><div class="skeleton skeleton-t2"></div><div class="skeleton skeleton-d1"></div><div class="skeleton skeleton-d2"></div><div class="skeleton skeleton-ft"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-src"></div><div class="skeleton skeleton-t1"></div><div class="skeleton skeleton-t2"></div><div class="skeleton skeleton-d1"></div><div class="skeleton skeleton-d2"></div><div class="skeleton skeleton-ft"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-src"></div><div class="skeleton skeleton-t1"></div><div class="skeleton skeleton-t2"></div><div class="skeleton skeleton-d1"></div><div class="skeleton skeleton-d2"></div><div class="skeleton skeleton-ft"></div></div></div>
   </div>
-
   <div class="load-more-wrap">
     <button id="loadMoreBtn" class="btn" style="display:none">Load more stories ↓</button>
   </div>
@@ -231,7 +188,6 @@
     <div class="modal-logo">🌐 OmniNexus</div>
     <h2>Welcome back</h2>
     <div id="loginError" class="form-error hidden"></div>
-
     {% if config.GOOGLE_CLIENT_ID %}
     <a href="/auth/google" class="btn btn-social btn-google full-w">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -244,7 +200,6 @@
     </a>
     <div class="modal-divider"><span>or</span></div>
     {% endif %}
-
     <input type="email" id="loginEmail" placeholder="Email address" />
     <input type="password" id="loginPassword" placeholder="Password" />
     <label class="remember-label">
@@ -263,7 +218,6 @@
     <div class="modal-logo">🌐 OmniNexus</div>
     <h2>Create account</h2>
     <div id="registerError" class="form-error hidden"></div>
-
     {% if config.GOOGLE_CLIENT_ID %}
     <a href="/auth/google" class="btn btn-social btn-google full-w">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -276,7 +230,6 @@
     </a>
     <div class="modal-divider"><span>or</span></div>
     {% endif %}
-
     <input type="text" id="regUsername" placeholder="Username" />
     <input type="email" id="regEmail" placeholder="Email address" />
     <input type="password" id="regPassword" placeholder="Password (min. 6 characters)" />
@@ -290,11 +243,105 @@
 <!-- TOAST -->
 <div id="toast" class="toast hidden"></div>
 
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" width="32" height="32">
+          <defs>
+            <linearGradient id="fgM" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="50%" stop-color="#a855f7"/>
+              <stop offset="100%" stop-color="#22d3ee"/>
+            </linearGradient>
+            <radialGradient id="fgC" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#22d3ee"/>
+              <stop offset="100%" stop-color="#6366f1" stop-opacity="0.8"/>
+            </radialGradient>
+          </defs>
+          <line x1="100" y1="100" x2="100" y2="38"  stroke="url(#fgM)" stroke-width="1.5" opacity="0.6"/>
+          <line x1="100" y1="100" x2="156" y2="62"  stroke="url(#fgM)" stroke-width="1.5" opacity="0.6"/>
+          <line x1="100" y1="100" x2="156" y2="138" stroke="url(#fgM)" stroke-width="1.5" opacity="0.6"/>
+          <line x1="100" y1="100" x2="100" y2="162" stroke="url(#fgM)" stroke-width="1.5" opacity="0.6"/>
+          <line x1="100" y1="100" x2="44"  y2="138" stroke="url(#fgM)" stroke-width="1.5" opacity="0.6"/>
+          <line x1="100" y1="100" x2="44"  y2="62"  stroke="url(#fgM)" stroke-width="1.5" opacity="0.6"/>
+          <circle cx="100" cy="100" r="18" fill="#0d1424" stroke="url(#fgM)" stroke-width="2"/>
+          <circle cx="100" cy="100" r="14" fill="url(#fgC)"/>
+          <text x="100" y="106" font-family="Arial Black,sans-serif" font-size="14" font-weight="900" text-anchor="middle" fill="white">N</text>
+        </svg>
+        <span class="footer-brand-name">OmniNexus</span>
+      </div>
+      <p class="footer-desc">Real-time global headlines in your language. Powered by AI, built for the world.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Navigate</h4>
+      <ul class="footer-links">
+        <li><a href="/">🏠 Home</a></li>
+        <li><a href="/contact">✉️ Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Contact / İletişim</h4>
+      <ul class="footer-links">
+        <li><a href="mailto:info@omninexsus.com">info@omninexsus.com</a></li>
+        <li><a href="mailto:iletisim@omninexsus.com">iletisim@omninexsus.com</a></li>
+        <li><a href="mailto:contact@omninexsus.com">contact@omninexsus.com</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Partnerships / İş Birliği</h4>
+      <ul class="footer-links">
+        <li><a href="mailto:isbirligi@omninexsus.com">isbirligi@omninexsus.com</a></li>
+        <li><a href="mailto:partnership@omninexsus.com">partnership@omninexsus.com</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 OmniNexus. All rights reserved.</span>
+    <span class="footer-sep">·</span>
+    <a href="/contact">Contact</a>
+  </div>
+</footer>
+
 <script src="/static/js/main.js"></script>
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/sw.js').catch(() => {});
-  }
+const VAPID_PUBLIC_KEY = '{{ config.VAPID_PUBLIC_KEY }}';
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+}
+async function subscribePush(reg) {
+  try {
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+    const json = sub.toJSON();
+    await fetch('/push/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: json.endpoint, keys: { p256dh: json.keys.p256dh, auth: json.keys.auth } }) });
+  } catch (e) { console.warn('Push subscribe failed:', e); }
+}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js').then(reg => {
+    setTimeout(async () => {
+      if (Notification.permission === 'default') {
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') subscribePush(reg);
+      } else if (Notification.permission === 'granted') {
+        const existing = await reg.pushManager.getSubscription();
+        if (!existing) subscribePush(reg);
+      }
+    }, 4000);
+  }).catch(() => {});
+}
 </script>
+
+{% if current_user.is_authenticated and current_user.is_admin() %}
+<div style="position:fixed;bottom:16px;left:16px;z-index:9999">
+  <a href="/admin" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#a855f7);color:white;text-decoration:none;padding:10px 18px;border-radius:10px;font-size:0.85rem;font-weight:700;box-shadow:0 4px 20px rgba(99,102,241,.4)">⚡ Admin Panel</a>
+</div>
+{% endif %}
 </body>
 </html>
