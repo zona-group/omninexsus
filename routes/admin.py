@@ -139,3 +139,67 @@ def mail_test():
         return jsonify({'success': True, 'message': f'Test maili {current_user.email} adresine gonderildi.'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@admin_bp.route('/mail-users', methods=['POST'])
+@admin_required
+def mail_users():
+    """Send bulk email to all active users (or all users)."""
+    data    = request.get_json(silent=True) or {}
+    subject = data.get('subject', '').strip()
+    body    = data.get('body', '').strip()
+    target  = data.get('target', 'active')  # 'active' or 'all'
+
+    if not subject or not body:
+        return jsonify({'success': False, 'error': 'Konu ve mesaj zorunludur.'}), 400
+
+    if target == 'all':
+        users = User.query.filter(User.email != None).all()
+    else:
+        users = User.query.filter_by(is_active=True).filter(User.email != None).all()
+
+    if not users:
+        return jsonify({'success': False, 'error': 'Gondesilecek uye bulunamadi.'}), 400
+
+    sent, failed = 0, 0
+    errors = []
+
+    html_template = (
+        '<!DOCTYPE html><html><head><meta charset="UTF-8"></head>'
+        '<body style="font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:20px;">'
+        '<div style="max-width:560px;margin:0 auto;background:#1e293b;border-radius:12px;padding:32px;">'
+        '<h1 style="color:#818cf8;margin-top:0;font-size:1.4rem;">OmniNexus</h1>'
+        '<div style="color:#e2e8f0;font-size:15px;line-height:1.7;white-space:pre-line;">{BODY}</div>'
+        '<hr style="border:none;border-top:1px solid #334155;margin:24px 0;">'
+        '<p style="color:#475569;font-size:12px;margin:0;">'
+        'Bu e-posta OmniNexus ekibi tarafindan gonderilmistir.<br>'
+        '<a href="https://www.omninexsus.com" style="color:#6366f1;">www.omninexsus.com</a>'
+        '</p></div></body></html>'
+    )
+
+    for user in users:
+        try:
+            msg = Message(
+                subject=subject,
+                recipients=[user.email],
+                html=html_template.replace('{BODY}', body)
+            )
+            mail.send(msg)
+            sent += 1
+        except Exception as e:
+            failed += 1
+            errors.append(f"{user.email}: {str(e)[:80]}")
+            current_app.logger.error(f"[mail-users] {user.email}: {e}")
+
+    if sent == 0:
+        return jsonify({
+            'success': False,
+            'error': f'Hicbir mail gonderilemedi. Hata: {errors[0] if errors else "Bilinmiyor"}'
+        }), 500
+
+    return jsonify({
+        'success': True,
+        'sent': sent,
+        'failed': failed,
+        'message': f'{sent} uyelere mail gonderildi.' + (f' {failed} basarisiz.' if failed else '')
+    })
