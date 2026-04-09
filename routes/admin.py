@@ -93,20 +93,6 @@ def activate_user(user_id):
     return jsonify({'success': True, 'message': f'{user.username} aktif edildi.'})
 
 
-@admin_bp.route('/users/search')
-@admin_required
-def search_users():
-    """Autocomplete: search users by email or username."""
-    q = request.args.get('q', '').strip()
-    if len(q) < 2:
-        return jsonify([])
-    users = User.query.filter(
-        User.email.isnot(None),
-        (User.email.ilike(f'%{q}%') | User.username.ilike(f'%{q}%'))
-    ).limit(8).all()
-    return jsonify([{'email': u.email, 'username': u.username} for u in users])
-
-
 @admin_bp.route('/notify', methods=['POST'])
 @admin_required
 def send_notification():
@@ -187,7 +173,7 @@ def mail_user():
 <body style="font-family:Arial,sans-serif;background:#0f172a;color:#e2e8f0;margin:0;padding:20px;">
   <div style="max-width:560px;margin:0 auto;background:#1e293b;border-radius:12px;padding:32px;">
     <h1 style="color:#818cf8;margin-top:0;font-size:1.4rem;">OmniNexus</h1>
-    <div style="color:#e2e8f0;font-size:15px;line-height:1.7;white-space:pre-line;">{"{body}"}</div>
+    <div style="color:#e2e8f0;font-size:15px;line-height:1.7;white-space:pre-line;">{body}</div>
     <hr style="border:none;border-top:1px solid #334155;margin:24px 0;">
     <p style="color:#475569;font-size:12px;margin:0;">
       OmniNexus ekibi tarafindan gonderilmistir.<br>
@@ -200,7 +186,7 @@ def mail_user():
         msg = Message(
             subject=subject,
             recipients=[to_email],
-            html=html_body.replace('{body}', body),
+            html=html_body,
             reply_to=current_user.email
         )
         mail.send(msg)
@@ -210,10 +196,25 @@ def mail_user():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@admin_bp.route('/users/search')
+@admin_required
+def search_users():
+    """Autocomplete: search users by email or username."""
+    q = request.args.get('q', '').strip()
+    if len(q) < 2:
+        return jsonify([])
+    users = User.query.filter(
+        User.email.isnot(None),
+        (User.email.ilike(f'%{q}%') | User.username.ilike(f'%{q}%'))
+    ).limit(8).all()
+    return jsonify([{'email': u.email, 'username': u.username} for u in users])
+
+
 @admin_bp.route('/mail-users', methods=['POST'])
 @admin_required
 def mail_users():
-    """Send bulk email to all active users (or all users)."""
+    """Send bulk email — fires in background thread, returns immediately."""
+    import threading
     data    = request.get_json(silent=True) or {}
     subject = data.get('subject', '').strip()
     body    = data.get('body', '').strip()
@@ -230,8 +231,8 @@ def mail_users():
     if not users:
         return jsonify({'success': False, 'error': 'Gondesilecek uye bulunamadi.'}), 400
 
-    sent, failed = 0, 0
-    errors = []
+    recipient_emails = [u.email for u in users]
+    count = len(recipient_emails)
 
     html_template = """<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
@@ -247,29 +248,26 @@ def mail_users():
   </div>
 </body></html>"""
 
-    for user in users:
-        try:
-            msg = Message(
-                subject=subject,
-                recipients=[user.email],
-                html=html_template.replace('{BODY}', body)
-            )
-            mail.send(msg)
-            sent += 1
-        except Exception as e:
-            failed += 1
-            errors.append(f"{user.email}: {str(e)[:80]}")
-            current_app.logger.error(f"[mail-users] {user.email}: {e}")
+    html_content = html_template.replace('{BODY}', body)
+    app = current_app._get_current_object()
 
-    if sent == 0:
-        return jsonify({
-            'success': False,
-            'error': f'Hicbir mail gonderilemedi. Hata: {errors[0] if errors else "Bilinmiyor"}'
-        }), 500
+    def send_bulk():
+        with app.app_context():
+            for email in recipient_emails:
+                try:
+                    msg = Message(
+                        subject=subject,
+                        recipients=[email],
+                        html=html_content
+                    )
+                    mail.send(msg)
+                except Exception as e:
+                    app.logger.error(f"[mail-users] {email}: {e}")
+
+    t = threading.Thread(target=send_bulk, daemon=True)
+    t.start()
 
     return jsonify({
         'success': True,
-        'sent': sent,
-        'failed': failed,
-        'message': f'{sent} uyelere mail gonderildi.' + (f' {failed} basarisiz.' if failed else '')
+        'message': f'{count} kisiiye mail gonderimi baslatildi. Arka planda devam ediyor.'
     })
