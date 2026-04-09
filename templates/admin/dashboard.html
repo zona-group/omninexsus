@@ -34,10 +34,13 @@
     .btn-success{background:#10b981;color:white}
     .btn-warn{background:#f59e0b;color:white}
     .notify-form{display:grid;gap:12px}
-    .notify-form input,.notify-form textarea,.notify-form select{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:0.9rem;width:100%}
-    .notify-form textarea{resize:vertical}
+    .notify-form input,.notify-form textarea{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:0.9rem;width:100%}
+    .notify-form textarea{height:80px;resize:vertical}
     .toast{position:fixed;bottom:24px;right:24px;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px 20px;color:#e2e8f0;font-size:0.9rem;z-index:9999;display:none;max-width:340px}
     .toast.show{display:block}
+    .page-nav{display:flex;gap:8px;align-items:center;margin-top:16px}
+    .page-nav a{color:#818cf8;text-decoration:none;padding:4px 10px;border:1px solid #334155;border-radius:6px;font-size:0.82rem}
+    .page-nav a:hover{background:#1e293b}
     @media(max-width:600px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
@@ -67,7 +70,7 @@
     <h2>📢 Push Bildirim Gönder</h2>
     <div class="notify-form">
       <input type="text" id="n-title" placeholder="Başlık (ör: 🔴 Son Dakika)" value="OmniNexus"/>
-      <textarea id="n-body" placeholder="Bildirim metni..." style="height:80px"></textarea>
+      <textarea id="n-body" placeholder="Bildirim metni..."></textarea>
       <input type="text" id="n-url" placeholder="Link (ör: /)" value="/"/>
       <div style="display:flex;gap:10px;align-items:center">
         <button class="btn btn-primary" onclick="sendNotification()">Tüm Abonelere Gönder</button>
@@ -77,14 +80,29 @@
     </div>
   </div>
 
+  <!-- Mail to Users -->
+  <div class="card">
+    <h2>✉️ Üyelere E-posta Gönder</h2>
+    <div class="notify-form">
+      <input type="text" id="m-subject" placeholder="Konu (ör: OmniNexus — Duyuru)"/>
+      <textarea id="m-body" placeholder="E-posta içeriği..." style="height:120px"></textarea>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select id="m-target" style="background:#1e293b;border:1px solid #334155;border-radius:8px;padding:10px 14px;color:#e2e8f0;font-size:0.9rem">
+          <option value="active">Sadece Aktif Üyeler</option>
+          <option value="all">Tüm Üyeler</option>
+        </select>
+        <button class="btn btn-primary" onclick="sendMailToUsers()" id="mail-btn">Gönder</button>
+        <span id="mail-result" style="color:#6ee7b7;font-size:0.85rem"></span>
+      </div>
+    </div>
+  </div>
+
   <!-- Personal Mail -->
   <div class="card">
     <h2>📩 Kişisel Mail Gönder</h2>
     <div class="notify-form">
       <div style="position:relative">
-        <input type="text" id="p-to" placeholder="E-posta veya kullanıcı adı ara..." autocomplete="off"
-               oninput="searchUser(this.value)"
-               onblur="setTimeout(()=>document.getElementById('p-suggest').style.display='none',200)"/>
+        <input type="text" id="p-to" placeholder="E-posta veya kullanıcı adı ara..." autocomplete="off" oninput="searchUser(this.value)" onblur="setTimeout(()=>document.getElementById('p-suggest').style.display='none',200)"/>
         <div id="p-suggest" style="position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:0 0 8px 8px;z-index:100;display:none;max-height:180px;overflow-y:auto"></div>
       </div>
       <input type="text" id="p-subject" placeholder="Konu"/>
@@ -92,23 +110,6 @@
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="sendPersonalMail()" id="p-btn">Gönder</button>
         <span id="p-result" style="font-size:0.85rem"></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bulk Mail -->
-  <div class="card">
-    <h2>✉️ Üyelere Toplu E-posta Gönder</h2>
-    <div class="notify-form">
-      <input type="text" id="m-subject" placeholder="Konu (ör: OmniNexus — Duyuru)"/>
-      <textarea id="m-body" placeholder="E-posta içeriği..." style="height:120px"></textarea>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <select id="m-target">
-          <option value="active">Sadece Aktif Üyeler</option>
-          <option value="all">Tüm Üyeler</option>
-        </select>
-        <button class="btn btn-primary" onclick="sendMailToUsers()" id="mail-btn">Gönder</button>
-        <span id="mail-result" style="color:#6ee7b7;font-size:0.85rem"></span>
       </div>
     </div>
   </div>
@@ -150,37 +151,39 @@
 <div class="toast" id="toast"></div>
 
 <script>
-function showToast(msg,ok=true){
+function showToast(msg, ok=true){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.style.borderColor=ok?'#10b981':'#ef4444';
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);
+  t.textContent=msg;
+  t.style.borderColor=ok?'#10b981':'#ef4444';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
 }
-async function api(url,data){
+async function api(url, data){
   const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
   return r.json();
 }
-async function toggleRole(id,cur){
+async function toggleRole(id, cur){
   const role=cur==='admin'?'user':'admin';
-  const d=await api('/admin/users/'+id+'/role',{role});
+  const d=await api(`/admin/users/${id}/role`,{role});
   if(d.success){
-    document.getElementById('role-'+id).textContent=d.role;
-    document.getElementById('role-'+id).className='badge '+d.role;
-    showToast(d.username+' rolü → '+d.role);
+    document.getElementById(`role-${id}`).textContent=d.role;
+    document.getElementById(`role-${id}`).className=`badge ${d.role}`;
+    showToast(`${d.username} rolü değiştirildi → ${d.role}`);
   } else showToast(d.error,false);
 }
-async function toggleActive(id,cur){
-  const d=await api('/admin/users/'+id+'/toggle-active',{});
+async function toggleActive(id, cur){
+  const d=await api(`/admin/users/${id}/toggle-active`,{});
   if(d.success){
-    const s=document.getElementById('status-'+id);
+    const s=document.getElementById(`status-${id}`);
     s.textContent=d.is_active?'Aktif':'Pasif';
-    s.className='badge '+(d.is_active?'active':'inactive');
+    s.className=`badge ${d.is_active?'active':'inactive'}`;
     showToast(d.message);
   } else showToast(d.error,false);
 }
 async function activateUser(id){
-  const d=await api('/admin/users/'+id+'/activate',{});
+  const d=await api(`/admin/users/${id}/activate`,{});
   if(d.success){
-    const s=document.getElementById('status-'+id);
+    const s=document.getElementById(`status-${id}`);
     if(s){s.textContent='Aktif';s.className='badge active';}
     showToast(d.message);
   } else showToast(d.error,false);
@@ -192,27 +195,25 @@ async function sendNotification(){
   if(!body){showToast('Bildirim metni girin!',false);return;}
   const d=await api('/admin/notify',{title,body,url});
   document.getElementById('notify-result').textContent=d.message||d.error;
-  showToast(d.message||d.error,d.success);
+  showToast(d.message||d.error, d.success);
 }
 async function mailTest(){
   const d=await api('/admin/mail-test',{});
-  showToast(d.message||d.error,d.success);
+  showToast(d.message||d.error, d.success);
 }
 async function searchUser(q){
   const box=document.getElementById('p-suggest');
   if(q.length<2){box.style.display='none';return;}
-  try{
-    const r=await fetch('/admin/users/search?q='+encodeURIComponent(q));
-    const users=await r.json();
-    if(!users.length){box.style.display='none';return;}
-    box.innerHTML=users.map(u=>
-      '<div onmousedown="selectUser(\'' + u.email + '\')" style="padding:9px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155">'
-      +'<span style="color:#e2e8f0;font-weight:600">'+u.username+'</span>'
-      +'<span style="color:#64748b;font-size:0.82rem">'+u.email+'</span>'
-      +'</div>'
-    ).join('');
-    box.style.display='block';
-  }catch(e){box.style.display='none';}
+  const r=await fetch(`/admin/users/search?q=${encodeURIComponent(q)}`);
+  const users=await r.json();
+  if(!users.length){box.style.display='none';return;}
+  box.innerHTML=users.map(u=>
+    `<div onmousedown="selectUser('${u.email}')" style="padding:9px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155">
+      <span style="color:#e2e8f0;font-weight:600">${u.username}</span>
+      <span style="color:#64748b;font-size:0.82rem">${u.email}</span>
+    </div>`
+  ).join('');
+  box.style.display='block';
 }
 function selectUser(email){
   document.getElementById('p-to').value=email;
@@ -224,17 +225,31 @@ async function sendPersonalMail(){
   const body=document.getElementById('p-body').value.trim();
   if(!to_email||!subject||!body){showToast('Alıcı, konu ve mesaj zorunludur!',false);return;}
   const btn=document.getElementById('p-btn');
+  const res=document.getElementById('p-result');
   btn.disabled=true;btn.textContent='Gönderiliyor...';
-  document.getElementById('p-result').textContent='';
-  const d=await api('/admin/mail-user',{to_email,subject,body});
-  btn.disabled=false;btn.textContent='Gönder';
-  document.getElementById('p-result').textContent=d.message||d.error;
-  document.getElementById('p-result').style.color=d.success?'#6ee7b7':'#fca5a5';
-  showToast(d.message||d.error,d.success);
-  if(d.success){
-    document.getElementById('p-to').value='';
-    document.getElementById('p-subject').value='';
-    document.getElementById('p-body').value='';
+  res.textContent='';
+  try{
+    const r=await fetch('/admin/mail-user',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({to_email,subject,body})
+    });
+    let d;
+    try{d=await r.json();}catch(e){d={success:false,error:'Sunucu geçersiz yanıt döndürdü ('+r.status+')'};}
+    res.textContent=d.message||d.error||'Bilinmeyen hata';
+    res.style.color=d.success?'#6ee7b7':'#fca5a5';
+    showToast(d.message||d.error||'Hata',d.success);
+    if(d.success){
+      document.getElementById('p-to').value='';
+      document.getElementById('p-subject').value='';
+      document.getElementById('p-body').value='';
+    }
+  }catch(e){
+    res.textContent='Ağ hatası: '+e.message;
+    res.style.color='#fca5a5';
+    showToast('Bağlantı hatası: '+e.message,false);
+  }finally{
+    btn.disabled=false;btn.textContent='Gönder';
   }
 }
 async function sendMailToUsers(){
@@ -243,13 +258,27 @@ async function sendMailToUsers(){
   const target=document.getElementById('m-target').value;
   if(!subject||!body){showToast('Konu ve mesaj zorunludur!',false);return;}
   const btn=document.getElementById('mail-btn');
+  const res=document.getElementById('mail-result');
   btn.disabled=true;btn.textContent='Gönderiliyor...';
-  document.getElementById('mail-result').textContent='';
-  const d=await api('/admin/mail-users',{subject,body,target});
-  btn.disabled=false;btn.textContent='Gönder';
-  document.getElementById('mail-result').textContent=d.message||d.error;
-  document.getElementById('mail-result').style.color=d.success?'#6ee7b7':'#fca5a5';
-  showToast(d.message||d.error,d.success);
+  res.textContent='';
+  try{
+    const r=await fetch('/admin/mail-users',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({subject,body,target})
+    });
+    let d;
+    try{d=await r.json();}catch(e){d={success:false,error:'Sunucu geçersiz yanıt döndürdü ('+r.status+')'};}
+    res.textContent=d.message||d.error||'Bilinmeyen hata';
+    res.style.color=d.success?'#6ee7b7':'#fca5a5';
+    showToast(d.message||d.error||'Hata',d.success);
+  }catch(e){
+    res.textContent='Ağ hatası: '+e.message;
+    res.style.color='#fca5a5';
+    showToast('Bağlantı hatası: '+e.message,false);
+  }finally{
+    btn.disabled=false;btn.textContent='Gönder';
+  }
 }
 </script>
 </body>
