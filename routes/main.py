@@ -1,14 +1,25 @@
 from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import current_user
 import requests
+import threading
 
 main = Blueprint('main', __name__)
+
+
+def _send_mail_async(app, msg):
+    """Send email in a background thread to avoid blocking the HTTP worker."""
+    with app.app_context():
+        try:
+            from app import mail
+            mail.send(msg)
+            app.logger.info("[contact] Mail sent successfully (async).")
+        except Exception as e:
+            app.logger.error(f"[contact] Async mail error: {e}")
 
 
 @main.route('/contact', methods=['POST'])
 def contact():
     from flask_mail import Message
-    from app import mail
 
     data     = request.get_json(silent=True) or {}
     name     = data.get('name', '').strip()
@@ -68,11 +79,16 @@ def contact():
             html=html_body,
             reply_to=email
         )
-        mail.send(msg)
+        # Send in background thread — HTTP response returns immediately,
+        # no Gunicorn worker timeout risk.
+        app = current_app._get_current_object()
+        t = threading.Thread(target=_send_mail_async, args=(app, msg))
+        t.daemon = True
+        t.start()
         return jsonify({'success': True, 'message': 'Mesajınız iletildi! En kısa sürede geri döneceğiz.'})
     except Exception as e:
         current_app.logger.error(f"[contact] {e}")
-        return jsonify({'success': False, 'error': 'Mail gönderilemedi. Lütfen tekrar deneyin.'}), 500
+        return jsonify({'success': False, 'error': 'Mesaj alınamadı. Lütfen tekrar deneyin.'}), 500
 
 
 @main.route('/')
