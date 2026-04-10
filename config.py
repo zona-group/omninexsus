@@ -67,6 +67,10 @@ class Config:
     CONTACT_EMAIL    = os.environ.get('CONTACT_EMAIL', '')    # genel iletisim -> defaults to MAIL_USERNAME
     ISBIRLIGI_EMAIL  = os.environ.get('ISBIRLIGI_EMAIL', '')  # isbirligi     -> defaults to MAIL_USERNAME
 
+    # ── Resend HTTP Email API (bypasses SMTP, works on Railway) ───────────────
+    RESEND_API_KEY   = os.environ.get('RESEND_API_KEY', '')
+    RESEND_FROM      = os.environ.get('RESEND_FROM', 'OmniNexus <onboarding@resend.dev>')
+
     # ── VAPID Push Notifications ───────────────────────────────────────────────
     VAPID_PUBLIC_KEY  = os.environ.get('VAPID_PUBLIC_KEY',  'BFpiirOZsoMKpDenm9Lr8rqLmWms4vc3IrjRO8KSj1AUCqpDFrFjbCh0AGp92mnKKy_R2YJIe-kbaCj7AMFhwSA')
     VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '0PS0l-BioW2ILRUkqYH70nms1imBikOmrdKHqhDvL10')
