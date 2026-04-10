@@ -56,11 +56,13 @@ class Config:
 
     # ── Flask-Mail (SMTP) ──────────────────────────────────────────────────────
     MAIL_SERVER   = os.environ.get('MAIL_SERVER',   'smtp.gmail.com')
-    MAIL_PORT     = int(os.environ.get('MAIL_PORT', 587))
-    MAIL_USE_TLS  = os.environ.get('MAIL_USE_TLS',  'true').lower() == 'true'
+    MAIL_PORT     = int(os.environ.get('MAIL_PORT', 465))
+    MAIL_USE_TLS  = os.environ.get('MAIL_USE_TLS',  'false').lower() == 'true'
+    MAIL_USE_SSL  = os.environ.get('MAIL_USE_SSL',  'true').lower()  == 'true'
+    MAIL_TIMEOUT  = int(os.environ.get('MAIL_TIMEOUT', 10))
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME', '')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', '')
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@omminexsus.com')
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@omninexsus.com')
     SITE_URL         = os.environ.get('SITE_URL', 'https://www.omninexsus.com')
     CONTACT_EMAIL    = os.environ.get('CONTACT_EMAIL', '')    # genel iletisim -> defaults to MAIL_USERNAME
     ISBIRLIGI_EMAIL  = os.environ.get('ISBIRLIGI_EMAIL', '')  # isbirligi     -> defaults to MAIL_USERNAME
