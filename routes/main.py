@@ -2,25 +2,24 @@ from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login import current_user
 import requests
 import threading
+import resend
 
 main = Blueprint('main', __name__)
 
 
-def _send_mail_async(app, msg):
-    """Send email in a background thread to avoid blocking the HTTP worker."""
+def _send_resend_async(app, params):
+    """Send email via Resend HTTP API in a background thread."""
     with app.app_context():
         try:
-            from app import mail
-            mail.send(msg)
-            app.logger.info("[contact] Mail sent successfully (async).")
+            resend.api_key = app.config.get('RESEND_API_KEY', '')
+            result = resend.Emails.send(params)
+            app.logger.info(f"[contact] Resend OK — id={result.get('id', '?')}")
         except Exception as e:
-            app.logger.error(f"[contact] Async mail error: {e}")
+            app.logger.error(f"[contact] Resend error: {e}")
 
 
 @main.route('/contact', methods=['POST'])
 def contact():
-    from flask_mail import Message
-
     data     = request.get_json(silent=True) or {}
     name     = data.get('name', '').strip()
     email    = data.get('email', '').strip()
@@ -32,7 +31,7 @@ def contact():
     if '@' not in email:
         return jsonify({'success': False, 'error': 'Geçersiz e-posta adresi.'}), 400
 
-    admin_email = current_app.config.get('MAIL_USERNAME', '')
+    admin_email = current_app.config.get('MAIL_USERNAME', 'info@omninexsus.com')
 
     if msg_type == 'isbirligi':
         recipient  = current_app.config.get('ISBIRLIGI_EMAIL') or admin_email
@@ -73,16 +72,17 @@ def contact():
 </body></html>"""
 
     try:
-        msg = Message(
-            subject=subject,
-            recipients=[recipient],
-            html=html_body,
-            reply_to=email
-        )
-        # Send in background thread — HTTP response returns immediately,
-        # no Gunicorn worker timeout risk.
+        from_addr = current_app.config.get('RESEND_FROM', 'OmniNexus <onboarding@resend.dev>')
+        params = {
+            "from": from_addr,
+            "to":   [recipient],
+            "subject": subject,
+            "html": html_body,
+            "reply_to": [email],
+        }
+        # Fire-and-forget via background thread — HTTP response instant
         app = current_app._get_current_object()
-        t = threading.Thread(target=_send_mail_async, args=(app, msg))
+        t = threading.Thread(target=_send_resend_async, args=(app, params))
         t.daemon = True
         t.start()
         return jsonify({'success': True, 'message': 'Mesajınız iletildi! En kısa sürede geri döneceğiz.'})
