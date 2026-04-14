@@ -1,4 +1,4 @@
-/* ===== OMNINEXUS -- PREMIUM DARK UI ===== */
+/* ===== OMNИНEXUS — PREMIUM DARK UI ===== */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;600;700;800&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -612,7 +612,7 @@ body::before {
   .hero-card { height: 320px; }
 }
 @media (max-width: 640px) {
-  /* Kill the animated gradient bg on mobile -- causes green/tint readability issues */
+  /* Kill the animated gradient bg on mobile — causes green/tint readability issues */
   body::before { display: none; }
 
   .news-grid { grid-template-columns: 1fr; }
@@ -654,7 +654,6 @@ body::before {
   .ticker-label { font-size: 11px; padding: 3px 8px; }
 }
 
-
 /* ============================================================
    SITE FOOTER
    ============================================================ */
@@ -676,6 +675,8 @@ body::before {
   gap: 40px;
   align-items: start;
 }
+
+.footer-brand {}
 
 .footer-logo-wrap {
   display: flex;
@@ -745,10 +746,15 @@ body::before {
 .footer-bottom a:hover { color: var(--accent); }
 .footer-sep { opacity: .4; }
 
+/* Footer responsive */
 @media (max-width: 900px) {
-  .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
   .footer-brand { grid-column: 1 / -1; }
 }
+
 @media (max-width: 540px) {
   .footer-inner { grid-template-columns: 1fr; gap: 24px; }
   .footer-desc { max-width: 100%; }
