@@ -378,7 +378,7 @@ let _contactType = 'contact';
 function switchContactTab(type) {
   _contactType = type;
   document.querySelectorAll('.c-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + type).classList.add('active');
+  document.getElementById'tab-' + type).classList.add('active');
   document.getElementById('c-desc-contact').style.display   = type === 'contact'    ? '' : 'none';
   document.getElementById('c-desc-isbirligi').style.display = type === 'isbirligi'  ? '' : 'none';
 }
