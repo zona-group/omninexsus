@@ -30,7 +30,7 @@ RSS_FEEDS = {
     'business': [
         'http://feeds.bbci.co.uk/news/business/rss.xml',
         'https://feeds.a.dj.com/rss/RSSWorldNews.xml',
-        'https://www.ft.com/?format=rss',
+        'https://www.ft.com/?format=rsp',
     ],
     'science': [
         'http://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
@@ -145,6 +145,7 @@ def _fetch_feed(feed_url):
         return feedparser.parse(feed_url)
     except Exception:
         return None
+
 
 def fetch_rss_articles(category='general', page_size=20, page=1):
     """Fetch and aggregate articles from RSS feeds for the given category."""
@@ -269,6 +270,7 @@ def search():
     result = {'articles': matched[:20]}
     _cache_set(cache_key, result)
     return jsonify(result)
+
 
 @news.route('/save', methods=['POST'])
 @login_required
