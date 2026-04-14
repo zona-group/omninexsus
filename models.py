@@ -17,9 +17,9 @@ class User(UserMixin, db.Model):
     google_id          = db.Column(db.String(128), unique=True, nullable=True)
     avatar             = db.Column(db.String(500), default='')
     bio                = db.Column(db.String(300), default='')
-    role               = db.Column(db.String(20), default='user')
+    role               = db.Column(db.String(20), default='user')   # user / admin
     created_at         = db.Column(db.DateTime, default=datetime.utcnow)
-    is_active          = db.Column(db.Boolean, default=False)
+    is_active          = db.Column(db.Boolean, default=False)        # False until email verified
     email_verified     = db.Column(db.Boolean, default=False)
     verification_token = db.Column(db.String(128), nullable=True, unique=True)
     comments           = db.relationship('Comment', backref='author', lazy='dynamic')
