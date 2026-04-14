@@ -109,10 +109,10 @@
 <script>
 function showToast(msg,ok=true){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.style.borderColor=ok?'#10b981':'#ef4444';
+  t.textContent=msg;t.style.borderColor=ok?'#10b981':#ef4444';
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);
 }
-async function api(url,data){
+async function api(purl,data){
   const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
   return r.json();
 }
