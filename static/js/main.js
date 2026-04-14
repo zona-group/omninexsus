@@ -1,4 +1,4 @@
-/* ===== OmniNexus \u2014 main.js v2 (Premium) ===== */
+/* ===== OmniNexus — main.js v2 (Premium) ===== */
 
 let currentCategory = 'general';
 let currentPage     = 1;
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
   }
 
-  // Language \u2014 UI language only, does NOT reload news
+  // Language — UI language only, does NOT reload news
   document.getElementById('langSelect')?.addEventListener('change', e => {
     currentLang = e.target.value;
     localStorage.setItem('omni_lang', currentLang);
@@ -79,7 +79,7 @@ async function loadNews(reset = true) {
       if (reset) {
         grid.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">\u{1F50E}</div>
+            <div class="empty-state-icon">🔎</div>
             <div class="empty-state-title">No articles found</div>
             <div class="empty-state-sub">Try a different category or check back later.</div>
           </div>`;
@@ -110,7 +110,7 @@ async function loadNews(reset = true) {
   } catch (err) {
     document.getElementById('newsGrid').innerHTML = `
       <div class="empty-state">
-        <div class="empty-state-icon">\u26A0\uFE0F</div>
+        <div class="empty-state-icon">⚠️</div>
         <div class="empty-state-title">Could not load news</div>
         <div class="empty-state-sub">Please check your NewsAPI key in Railway environment variables.</div>
       </div>`;
@@ -133,6 +133,19 @@ function showSkeletons() {
     </div>`).join('');
 }
 
+// ======= READER URL HELPER =======
+function readerUrl(a) {
+  return '/news/read?' + new URLSearchParams({
+    url:   a.url   || '',
+    title: a.title || '',
+    src:   (a.source && a.source.name) || '',
+    img:   a.urlToImage || '',
+    desc:  a.description || '',
+    date:  a.publishedAt || '',
+    id:    a.id || ''
+  }).toString();
+}
+
 // ======= HERO CARD =======
 function renderHero(article) {
   const slot = document.getElementById('heroSlot');
@@ -141,13 +154,14 @@ function renderHero(article) {
     ? new Date(article.publishedAt).toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric', year:'numeric' })
     : '';
   const isSaved = savedIds.includes(article.id);
+  const rUrl = readerUrl(article);
 
   const heroImg = article.urlToImage
     ? `/news/imgproxy?url=${encodeURIComponent(article.urlToImage)}`
     : null;
 
   slot.innerHTML = `
-    <div class="hero-card" onclick="window.open('${escHtml(article.url)}','_blank')">
+    <div class="hero-card" onclick="window.location='${escHtml(rUrl)}'">
       ${heroImg
         ? `<img class="hero-img" src="${escHtml(heroImg)}" alt=""
              onerror="this.style.background='linear-gradient(135deg,#1a2236,#0d1424)';this.style.opacity='.5'" />`
@@ -167,7 +181,7 @@ function renderHero(article) {
               \u{1F516} ${isSaved ? 'Saved' : 'Save'}
             </button>
             <button class="btn btn-sm" onclick="openComments('${article.id}')">\u{1F4AC} Discuss</button>
-            <button class="btn btn-sm btn-primary" onclick="window.open('${escHtml(article.url)}','_blank')">Read \u2192</button>
+            <a class="btn btn-sm btn-primary" href="${escHtml(rUrl)}">Read \u2192</a>
           </div>
         </div>
       </div>
@@ -186,6 +200,7 @@ function createCard(article, index = 0) {
     ? new Date(article.publishedAt).toLocaleDateString(undefined, { month:'short', day:'numeric' })
     : '';
   const source = article.source?.name || '';
+  const rUrl = readerUrl(article);
 
   const imgSrc = article.urlToImage
     ? `/news/imgproxy?url=${encodeURIComponent(article.urlToImage)}`
@@ -200,7 +215,7 @@ function createCard(article, index = 0) {
       ${imgSrc ? `<div class="card-img-overlay"></div><div class="card-img-src">${escHtml(source)}</div>` : ''}
     </div>
     <div class="card-body">
-      <a class="card-title" href="${escHtml(article.url)}" target="_blank" rel="noopener"
+      <a class="card-title" href="${escHtml(rUrl)}"
          onclick="event.stopPropagation()">${escHtml(article.title || '')}</a>
       ${article.description
         ? `<p class="card-desc" data-orig="${escAttr(article.description)}">${escHtml(article.description)}</p>
@@ -217,7 +232,7 @@ function createCard(article, index = 0) {
           <button class="icon-btn" title="Comments" onclick="openComments('${article.id}')">
             \u{1F4AC} Discuss
           </button>
-          <a class="icon-btn" href="${escHtml(article.url)}" target="_blank" rel="noopener" title="Open article">\u2197</a>
+          <a class="icon-btn" href="${escHtml(rUrl)}" title="Read article">\u2197</a>
         </div>
       </div>
     </div>`;
@@ -240,7 +255,7 @@ async function doSearch() {
     const grid = document.getElementById('newsGrid');
     grid.innerHTML = '';
     if (!data.articles?.length) {
-      grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">\u{1F50E}</div>
+      grid.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔎</div>
         <div class="empty-state-title">No results for "${escHtml(q)}"</div></div>`;
       return;
     }
@@ -254,7 +269,7 @@ async function doSearch() {
 async function translateDesc(btn, text) {
   if (!text) return;
   const orig = btn.textContent;
-  btn.textContent = '\u23F3';
+  btn.textContent = '⏳';
   btn.disabled = true;
   try {
     const resp = await fetch('/translate', {
@@ -266,11 +281,11 @@ async function translateDesc(btn, text) {
     const descEl = btn.closest('.card-body')?.querySelector('.card-desc');
     if (descEl && data.translated) {
       descEl.textContent = data.translated;
-      btn.textContent = '\u21A9 Original';
+      btn.textContent = '↩ Original';
       btn.disabled = false;
       btn.onclick = () => {
         descEl.textContent = text;
-        btn.textContent = '\u{1F310} Translate';
+        btn.textContent = '🌐 Translate';
         btn.onclick = () => translateDesc(btn, text);
       };
       return;
@@ -343,16 +358,16 @@ function createCommentEl(c) {
   const el = document.createElement('div');
   el.className = 'comment-item';
   el.innerHTML = `
-    <div class="comment-author">\u{1F464} ${escHtml(c.author)}</div>
+    <div class="comment-author">👤 ${escHtml(c.author)}</div>
     <div class="comment-content">${escHtml(c.content)}</div>
     <div class="comment-footer">
       <span class="comment-date">${new Date(c.created_at).toLocaleDateString()}</span>
-      <button class="like-btn ${c.liked?'liked':''}" onclick="likeComment(this,${c.id})">\u2764 ${c.like_count}</button>
-      <button class="icon-btn" style="font-size:11px" onclick="replyTo(${c.id})">\u21A9 Reply</button>
+      <button class="like-btn ${c.liked?'liked':''}" onclick="likeComment(this,${c.id})">❤ ${c.like_count}</button>
+      <button class="icon-btn" style="font-size:11px" onclick="replyTo(${c.id})">↩ Reply</button>
     </div>
     ${c.replies?.length ? `<div class="replies">${c.replies.map(r=>`
       <div class="comment-item">
-        <div class="comment-author">\u{1F464} ${escHtml(r.author)}</div>
+        <div class="comment-author">👤 ${escHtml(r.author)}</div>
         <div class="comment-content">${escHtml(r.content)}</div>
         <div class="comment-date" style="font-size:11px;color:var(--text3)">${new Date(r.created_at).toLocaleDateString()}</div>
       </div>`).join('')}</div>` : ''}`;
@@ -379,10 +394,10 @@ async function submitComment() {
 async function likeComment(btn, commentId) {
   try {
     const resp = await fetch(`/comments/like/${commentId}`, { method: 'POST' });
-    if (resp.status === 401) { openModal('loginModal'); return; }
+    if (resp.status === 401) { openModal('loginModal'); return; x
     const data = await resp.json();
     btn.className = `like-btn ${data.liked?'liked':''}`;
-    btn.textContent = `\u2764 ${data.like_count}`;
+    btn.textContent = `❤ ${data.like_count}`;
   } catch {}
 }
 let replyParentId = null;
@@ -405,7 +420,7 @@ async function doLogin() {
     });
     const data = await resp.json();
     if (data.success) {
-      showToast(`Welcome back, ${data.username}! \u{1F44B}`, 'success');
+      showToast(`Welcome back, ${data.username}! 👋`, 'success');
       setTimeout(() => location.reload(), 900);
     } else {
       if (errEl) { errEl.textContent = data.error || 'Login failed'; errEl.classList.remove('hidden'); }
@@ -429,9 +444,9 @@ async function doRegister() {
     if (data.success) {
       if (data.needs_verification) {
         closeModal && closeModal();
-        showToast(`Ho\u015F geldiniz ${data.username}! E-postan\u0131z\u0131 do\u011Frulay\u0131n. \u{1F4E7}`, 'success');
+        showToast(`Hoş geldiniz ${data.username}! E-postanızı doğrulayın. 📧`, 'success');
       } else {
-        showToast(`Welcome to OmniNexus, ${data.username}! \u{1F389}`, 'success');
+        showToast(`Welcome to OmniNexus, ${data.username}! 🎉`, 'success');
         setTimeout(() => location.reload(), 900);
       }
     } else {
