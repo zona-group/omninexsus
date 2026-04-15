@@ -1,43 +1,44 @@
-import './App.css'
-import { Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import { NewsProvider } from './context/NewsContext'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Home from './pages/Home'
-import About from './pages/About'
-import SearchResults from './pages/SearchResults'
-import ArticleDetail from './pages/ArticleDetail'
-import Profile from './pages/Profile'
-import SavedArticles from './pages/SavedArticles'
-import Admin from './pages/Admin'
-import Privacy from './pages/Privacy'
-import Terms from './pages/Terms'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/context/AuthContext';
+import { NewsProvider } from '@/context/NewsContext';
+import { Toaster } from '@/components/ui/sonner';
+
+// Pages
+import Home from '@/pages/Home';
+import ArticleDetail from '@/pages/ArticleDetail';
+import SavedArticles from '@/pages/SavedArticles';
+import Profile from '@/pages/Profile';
+import About from '@/pages/About';
+import Privacy from '@/pages/Privacy';
+import Terms from '@/pages/Terms';
+import Admin from '@/pages/Admin';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
+import SearchResults from '@/pages/SearchResults';
 
 function App() {
   return (
-    <AuthProvider>
-      <NewsProvider>
-        <div className="app-container">
-          <Navbar />
-          <main className="app-main">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/article/:id" element={<ArticleDetail />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/saved" element={<SavedArticles />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </NewsProvider>
-    </AuthProvider>
-  )
+    <Router>
+      <AuthProvider>
+        <NewsProvider>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/article/:id" element={<ArticleDetail />} />
+            <Route path="/saved" element={<SavedArticles />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/search" element={<SearchResults />} />
+          </Routes>
+          <Toaster position="bottom-right" />
+        </NewsProvider>
+      </AuthProvider>
+    </Router>
+  );
 }
 
-export default App
+export default App;
