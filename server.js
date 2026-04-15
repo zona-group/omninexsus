@@ -1,13 +1,1 @@
-const http=require('http'),fs=require('fs'),path=require('path');
-const port=process.env.PORT||3000;
-const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.ico':'image/x-icon','.png':'image/png','.svg':'image/svg+xml'};
-http.createServer((req,res)=>{
-  const url=req.url.split('?')[0];
-  let fp=path.join(__dirname,'dist',url==='/'?'index.html':url);
-  if(!fs.existsSync(fp)||fs.statSync(fp).isDirectory())fp=path.join(__dirname,'dist','index.html');
-  const ct=mime[path.extname(fp)]||'application/octet-stream';
-  fs.readFile(fp,(err,data)=>{
-    if(err){res.writeHead(404);res.end('Not found');return;}
-    res.writeHead(200,{'Content-Type':ct});res.end(data);
-  });
-}).listen(port,'0.0.0.0',()=>console.log('OmniNexus live on port '+port));
+const http=require('http'),fs=require('fs'),path=require('path');const port=process.env.PORT||3000;const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.json':'application/json','.ico':'image/x-icon','.png':'image/png','.svg':'image/svg+xml'};http.createServer((req,res)=>{const url=req.url.split('?')[0];let fp=path.join(__dirname,'dist',url==='/'?'index.html':url);if(!fs.existsSync(fp)||fs.statSync(fp).isDirectory())fp=path.join(__dirname,'dist','index.html');const ct=mime[path.extname(fp)]||'application/octet-stream';fs.readFile(fp,(err,data)=>{if(err){res.writeHead(404);res.end('Not found');return;}res.writeHead(200,{'Content-Type':ct});res.end(data);});}).listen(port,'0.0.0.0',()=>console.log('OmniNexus live on port '+port));
