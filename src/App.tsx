@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { NewsProvider } from '@/context/NewsContext';
-import { Toaster } from '@/components/ui/sonner';
+import { Sonner } from '@/components/ui/sonner';
 
 // Pages
 import Home from '@/pages/Home';
@@ -34,7 +34,7 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/search" element={<SearchResults />} />
           </Routes>
-          <Toaster position="bottom-right" />
+          <Sonner />
         </NewsProvider>
       </AuthProvider>
     </Router>
