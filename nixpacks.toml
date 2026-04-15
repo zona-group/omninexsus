@@ -1,2 +1,5 @@
+[phases.build]
+cmds = ["npm install", "npm run build"]
+
 [start]
-cmd = "gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+cmd = "npx serve -s dist -l tcp://0.0.0.0:${PORT:-3000}"

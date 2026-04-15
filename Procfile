@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+web: npm run build && npx serve -s dist -l tcp://0.0.0.0:$PORT
