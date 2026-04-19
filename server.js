@@ -4,7 +4,7 @@ const path = require('path');
 
 const port = process.env.PORT || 3000;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const MAIL_FROM = process.env.MAIL_DEFAULT_SENDER || 'OmniNexus <noreply@omninexsus.com>';
+const MAIL_FROM = "OmniNexus <onboarding@resend.dev>";
 const SITE_URL = 'https://www.omninexsus.com';
 
 const mime = {
