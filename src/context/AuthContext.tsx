@@ -83,6 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { password: _, ...userWithoutPassword } = newUser;
     setUser(userWithoutPassword as User);
     localStorage.setItem('omni_user', JSON.stringify(userWithoutPassword));
+    // Send welcome email
+    fetch('/api/email/welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email }),
+    }).catch(() => {});
     return true;
   };
 
@@ -98,6 +104,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (foundUser) {
       const resetToken = 'reset_' + Date.now();
       localStorage.setItem('omni_reset_token', JSON.stringify({ email, token: resetToken }));
+      fetch('/api/email/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token: resetToken, name: foundUser.name }),
+      }).catch(() => {});
       return true;
     }
     return false;
