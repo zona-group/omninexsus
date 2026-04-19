@@ -19,8 +19,51 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Search, User, Bookmark, Settings, LogOut, Menu, X } from 'lucide-react';
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 interface NavbarProps {
   onSearch?: (query: string) => void;
+}
+
+const googleIconSvg = (
+  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+    <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+    <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+    <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+  </svg>
+);
+
+// Separate component - useGoogleLogin is only called when Google OAuth is configured
+function GoogleOAuthButton({
+  label,
+  onGoogleSuccess,
+  onGoogleFallback,
+}: {
+  label: string;
+  onGoogleSuccess: (userData: { email: string; name: string; avatar: string }) => void;
+  onGoogleFallback: () => void;
+}) {
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        }).then((r) => r.json());
+        onGoogleSuccess({ email: userInfo.email, name: userInfo.name, avatar: userInfo.picture });
+      } catch {
+        onGoogleFallback();
+      }
+    },
+    onError: () => onGoogleFallback(),
+  });
+
+  return (
+    <Button type="button" variant="outline" className="w-full" onClick={() => googleLogin()}>
+      {googleIconSvg}
+      {label}
+    </Button>
+  );
 }
 
 export default function Navbar({ onSearch }: NavbarProps) {
@@ -46,7 +89,6 @@ export default function Navbar({ onSearch }: NavbarProps) {
     <nav className="sticky top-0 z-50 glass border-b border-border/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">N</span>
@@ -57,7 +99,6 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </div>
           </Link>
 
-          {/* Search Bar - Desktop */}
           <form onSubmit={handleSearch} className="hidden md:flex items-center flex-1 max-w-md mx-8">
             <div className="relative w-full">
               <Input
@@ -76,9 +117,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </div>
           </form>
 
-          {/* Right Section */}
           <div className="flex items-center gap-2">
-            {/* Language Selector */}
             <select className="hidden sm:block bg-transparent text-sm text-muted-foreground border border-border/50 rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary">
               <option value="en">🇺🇸 EN</option>
               <option value="tr">🇹🇷 TR</option>
@@ -88,7 +127,6 @@ export default function Navbar({ onSearch }: NavbarProps) {
               <option value="ja">🇯🇵 JA</option>
             </select>
 
-            {/* Contact Link */}
             <Link
               to="/#contact"
               className="hidden md:block text-sm text-muted-foreground hover:text-primary transition-colors px-3 py-1.5 border border-border/50 rounded-lg"
@@ -96,7 +134,6 @@ export default function Navbar({ onSearch }: NavbarProps) {
               İletişim
             </Link>
 
-            {/* Auth Buttons */}
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -138,13 +175,16 @@ export default function Navbar({ onSearch }: NavbarProps) {
                 <Button variant="ghost" size="sm" onClick={() => setShowLoginModal(true)}>
                   Login
                 </Button>
-                <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600" onClick={() => setShowRegisterModal(true)}>
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600"
+                  onClick={() => setShowRegisterModal(true)}
+                >
                   Sign Up
                 </Button>
               </div>
             )}
 
-            {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="icon"
@@ -156,7 +196,6 @@ export default function Navbar({ onSearch }: NavbarProps) {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border/50 animate-fadeIn">
             <form onSubmit={handleSearch} className="mb-4">
@@ -179,7 +218,10 @@ export default function Navbar({ onSearch }: NavbarProps) {
               {!isAuthenticated && (
                 <>
                   <Button variant="ghost" onClick={() => setShowLoginModal(true)}>Login</Button>
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-600" onClick={() => setShowRegisterModal(true)}>
+                  <Button
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600"
+                    onClick={() => setShowRegisterModal(true)}
+                  >
                     Sign Up
                   </Button>
                 </>
@@ -189,36 +231,39 @@ export default function Navbar({ onSearch }: NavbarProps) {
         )}
       </div>
 
-      {/* Login Modal */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center gradient-text">Welcome Back</DialogTitle>
           </DialogHeader>
-          <LoginForm onClose={() => setShowLoginModal(false)} onRegisterClick={() => {
-            setShowLoginModal(false);
-            setShowRegisterModal(true);
-          }} />
+          <LoginForm
+            onClose={() => setShowLoginModal(false)}
+            onRegisterClick={() => {
+              setShowLoginModal(false);
+              setShowRegisterModal(true);
+            }}
+          />
         </DialogContent>
       </Dialog>
 
-      {/* Register Modal */}
       <Dialog open={showRegisterModal} onOpenChange={setShowRegisterModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center gradient-text">Create Account</DialogTitle>
           </DialogHeader>
-          <RegisterForm onClose={() => setShowRegisterModal(false)} onLoginClick={() => {
-            setShowRegisterModal(false);
-            setShowLoginModal(true);
-          }} />
+          <RegisterForm
+            onClose={() => setShowRegisterModal(false)}
+            onLoginClick={() => {
+              setShowRegisterModal(false);
+              setShowLoginModal(true);
+            }}
+          />
         </DialogContent>
       </Dialog>
     </nav>
   );
 }
 
-// Login Form Component
 function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegisterClick: () => void }) {
   const { login, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
@@ -231,7 +276,6 @@ function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegist
     e.preventDefault();
     setLoading(true);
     setError('');
-    
     const success = await login(email, password);
     if (success) {
       onClose();
@@ -241,39 +285,36 @@ function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegist
     setLoading(false);
   };
 
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        }).then(r => r.json());
-        await loginWithGoogle({ email: userInfo.email, name: userInfo.name, avatar: userInfo.picture });
-      } catch {
-        await loginWithGoogle();
-      }
-      onClose();
-    },
-    onError: () => { loginWithGoogle(); onClose(); },
-  });
-  const handleGoogleLogin = () => googleLogin();
+  const handleGoogleSuccess = async (userData: { email: string; name: string; avatar: string }) => {
+    await loginWithGoogle(userData);
+    onClose();
+  };
+
+  const handleGoogleFallback = async () => {
+    await loginWithGoogle();
+    onClose();
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={handleGoogleLogin}
-      >
-        <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        Continue with Google
-      </Button>
-      
+      {GOOGLE_CLIENT_ID ? (
+        <GoogleOAuthButton
+          label="Continue with Google"
+          onGoogleSuccess={handleGoogleSuccess}
+          onGoogleFallback={handleGoogleFallback}
+        />
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleGoogleFallback}
+        >
+          {googleIconSvg}
+          Continue with Google
+        </Button>
+      )}
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -283,35 +324,17 @@ function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegist
         </div>
       </div>
 
-      {error && (
-        <div className="text-sm text-red-500 text-center">{error}</div>
-      )}
+      {error && <div className="text-sm text-red-500 text-center">{error}</div>}
 
-      <Input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <Input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+      <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
       <div className="flex items-center justify-between text-sm">
         <label className="flex items-center gap-2">
           <input type="checkbox" className="rounded border-border" />
           <span className="text-muted-foreground">Remember me</span>
         </label>
-        <button
-          type="button"
-          onClick={() => navigate('/forgot-password')}
-          className="text-primary hover:underline"
-        >
+        <button type="button" onClick={() => navigate('/forgot-password')} className="text-primary hover:underline">
           Forgot password?
         </button>
       </div>
@@ -330,7 +353,6 @@ function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegist
   );
 }
 
-// Register Form Component
 function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginClick: () => void }) {
   const { register, loginWithGoogle } = useAuth();
   const [name, setName] = useState('');
@@ -343,7 +365,6 @@ function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginC
     e.preventDefault();
     setLoading(true);
     setError('');
-    
     const success = await register(email, password, name);
     if (success) {
       onClose();
@@ -353,34 +374,36 @@ function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginC
     setLoading(false);
   };
 
-  const googleSignup = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        }).then(r => r.json());
-        await loginWithGoogle({ email: userInfo.email, name: userInfo.name, avatar: userInfo.picture });
-      } catch {
-        await loginWithGoogle();
-      }
-      onClose();
-    },
-    onError: () => { loginWithGoogle(); onClose(); },
-  });
-  const handleGoogleSignup = () => googleLogin();
+  const handleGoogleSuccess = async (userData: { email: string; name: string; avatar: string }) => {
+    await loginWithGoogle(userData);
+    onClose();
+  };
+
+  const handleGoogleFallback = async () => {
+    await loginWithGoogle();
+    onClose();
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <Button type="button" variant="outline" className="w-full" onClick={handleGoogleSignup}>
-        <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        Sign up with Google
-      </Button>
-      
+      {GOOGLE_CLIENT_ID ? (
+        <GoogleOAuthButton
+          label="Sign up with Google"
+          onGoogleSuccess={handleGoogleSuccess}
+          onGoogleFallback={handleGoogleFallback}
+        />
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleGoogleFallback}
+        >
+          {googleIconSvg}
+          Sign up with Google
+        </Button>
+      )}
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
@@ -390,31 +413,11 @@ function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginC
         </div>
       </div>
 
-      {error && (
-        <div className="text-sm text-red-500 text-center">{error}</div>
-      )}
+      {error && <div className="text-sm text-red-500 text-center">{error}</div>}
 
-      <Input
-        type="text"
-        placeholder="Full Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
-      <Input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <Input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
+      <Input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />
+      <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+      <Input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
       <Button type="submit" className="w-full bg-gradient-to-r from-indigo-500 to-purple-600" disabled={loading}>
         {loading ? 'Creating account...' : 'Create Account'}
