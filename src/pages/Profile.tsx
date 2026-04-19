@@ -1,141 +1,157 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link} from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Switch } from '@/components/ui/switch';
-import { 
-  User, 
-  Mail, 
-  Bookmark, 
-  MessageCircle, 
-  Settings, 
-  Bell,
-  Moon,
-  Globe,
-  Lock,
-  Eye,
-  EyeOff,
-  Save,
-  LogOut
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { User, Mail, Calendar, Bookmark, Settings, LogOut, Edit2, Save, X } from 'lucide-react';
 
 export default function Profile() {
-  const { user, isAuthenticated, logout, updateProfile, updatePassword } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
-  const [language, setLanguage] = useState('en');
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      toast.error('Please login to view your profile');
-      navigate('/');
-    } else if (user) {
-      setName(user.name);
-      setEmail(user.email);
-      setNotifications(user.preferences?.notifications ?? true);
-      setDarkMode(user.preferences?.theme === 'dark');
-      setLanguage(user.preferences?.language || 'en');
-    }
-  }, [isAuthenticated, user]);
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+          <User className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+          <h1 className="text-2xl font-bold mb-2">Sign in to view your profile</h1>
+          <p className="text-muted-foreground mb-6">Create an account or log in to access your profile and saved articles.</p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600"
+            onClick={() => navigate('/')}
+          >
+            Go to Home
+          </Button>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-  const handleUpdateProfile = async () => {
-    const success = await updateProfile({ name, email });
-    if (success) {
-      toast.success('Profile updated successfully');
-    } else {
-      toast.error('Failed to update profile');
-    }
-  };
-
-  const handleUpdatePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
-    if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-    
-    const success = await updatePassword(currentPassword, newPassword);
-    if (success) {
-      toast.success('Password updated successfully');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } else {
-      toast.error('Current password is incorrect');
-    }
-  };
-
-  const handleUpdatePreferences = async () => {
-    const success = await updateProfile({
-      preferences: {
-        language,
-        notifications,
-        theme: darkMode ? 'dark' : 'light'
-      }
-    });
-    if (success) {
-      toast.success('Preferences saved');
-    }
+  const handleSave = () => {
+    setEditing(false);
   };
 
   const handleLogout = () => {
     logout();
     navigate('/');
-    toast.success('Logged out successfully');
   };
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold gradient-text mb-2">My Profile</h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and preferences
-          </p>
-        </div>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-3xl font-bold gradient-text mb-8">My Profile</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Sidebar */}
-          <div className="lg:col-span-H]Û\ÜÓ[YOHË\ÙXÛÛ\KÌÌÝ[YLM^XÙ[\]]\Û\ÜÓ[YOHËLL^X]]ÈXM]]\[XYÙHÜÏ^Ý\Ù\]]\HÏ]]\[XÚÈÛ\ÜÓ[YOH^LËYÜYY[]ËXÛKZ[YÛËMLË\\KMÝ\Ù\[YVÌ_BÐ]]\[XÚÏÐ]]\Û\ÜÓ[YOH^^ÛXÛXLHÝ\Ù\[Y_OÚÛ\ÜÓ[YOH^\ÛH^[]]YYÜYÜÝ[XMÝ\Ù\[XZ[OÜ]Û\ÜÓ[YOH^^È^[]]YYÜYÜÝ[Y[X\Ú[ÙHÛ]È]J\Ù\ÜX]Y]
-KÓØØ[Q]TÝ[Ê
-_BÙ]]Û\ÜÓ[YOHÜYÜYXÛÛËLØ\M]M[ÈÏHÜØ]YÛ\ÜÓ[YOHË\ÙXÛÛ\KÍLÝ[Y^LÈÝ\Ë\ÙXÛÛ\H[Ú][ÛXÛÛÜÈÛÚÛX\ÈÛ\ÜÓ[YOHËMHMH^X]]ÈXLH^\[X\HÏ]Û\ÜÓ[YOH^\ÛHÛ[YY][HØ]YÙ]Ó[Ï]Û\ÜÓ[YOHË\ÙXÛÛ\KÍLÝ[Y^LÈY\ÜØYÙPÚ\ÛHÛ\ÜÓ[YOHËMHMH^X]]ÈXLH^\[X\HÏ]Û\ÜÓ[YOH^\ÛHÛ[YY][HÛÛ[Y[ÏÙ]Ù]Ù]]Û\X[H\ÝXÝ]HÛ\ÜÓ[YOHËY[]MÛÛXÚÏ^Ú[SÙÛÝ]BÙÓÝ]Û\ÜÓ[YOHËMM\LÏÙÛÝ]Ð]ÛÙ]Ù]ËÊXZ[ÛÛ[
-ßB]Û\ÜÓ[YOHÎÛÛ\Ü[LXÈY][[YOHÙ[HÛ\ÜÓ[YOHËY[XÓ\ÝÛ\ÜÓ[YOHÜYËY[ÜYXÛÛËLÈXÕYÙÙ\[YOHÙ[H\Ù\Û\ÜÓ[YOHËMM\LÏÙ[BÕXÕYÙÙ\XÕYÙÙ\[YOHÙXÝ\]HØÚÈÛ\ÜÓ[YOHËMM\LÏÙXÝ\]BÕXÕYÙÙ\XÕYÙÙ\[YOHY\[Ù\ÈÙ][ÜÈÛ\ÜÓ[YOHËMM\LÏY\[Ù\ÂÕXÕYÙÙ\ÕXÓ\ÝËÊÙ[HX
-ßBXÐÛÛ[[YOHÙ[HÛ\ÜÓ[YOH]M]Û\ÜÓ[YOHË\ÙXÛÛ\KÌÌÝ[YLMÈÛ\ÜÓ[YOH^[ÈÛ\Ù[ZXÛXM^][\ËXÙ[\Ø\L\Ù\Û\ÜÓ[YOHËMHMH^\[X\HÏ\ÛÛ[[ÜX][ÛÚÏ]Û\ÜÓ[YOHÜXÙK^KM]X[[ÜH[YH[[YOÓX[]Û\ÜÓ[YOH[]]H]LKH\Ù\Û\ÜÓ[YOHXÛÛ]HYLÈÜLKÌ][Û]K^KLKÌËMM^[]]YYÜYÜÝ[Ï[]YH[YH[YO^Û[Y_BÛÚ[ÙO^ÊJHOÙ][YJK\Ù][YJ_BÛ\ÜÓ[YOHLLÏÙ]Ù]]X[[ÜH[XZ[[XZ[Y\ÜÏÓX[]Û\ÜÓ[YOH[]]H]LKHXZ[Û\ÜÓ[YOHXÛÛ]HYLÈÜLKÌ][Û]K^KLKÌËMM^[]]YYÜYÜÝ[Ï[]YH[XZ[\OH[XZ[[YO^Ù[XZ[BÛÚ[ÙO^ÊJHOÙ][XZ[
-K\Ù][YJ_BÛ\ÜÓ[YOHLLÏÙ]Ù]]Û\ÜÓ[YOHM]ÛÛÛXÚÏ^Ú[U\]TÙ[_BÛ\ÜÓ[YOHËYÜYY[]Ë\ÛKZ[YÛËMLË\\KMØ]HÛ\ÜÓ[YOHËMM\LÏØ]HÚ[Ù\ÂÐ]ÛÙ]Ù]Ù]ÕXÐÛÛ[ËÊÙXÝ\]HX
-ßBXÐÛÛ[[YOHÙXÝ\]HÛ\ÜÓ[YOH]M]Û\ÜÓ[YOHË\ÙXÛÛ\KÌÌÝ[YLMÈÛ\ÜÓ[YOH^[ÈÛ\Ù[ZXÛXM^][\ËXÙ[\Ø\LØÚÈÛ\ÜÓ[YOHËMHMH^\[X\HÏÚ[ÙH\ÜÝÛÜÚÏ]Û\ÜÓ[YOHÜXÙK^KM]X[[ÜHÝ\[\ÜÝÛÜÝ\[\ÜÝÛÜÓX[]Û\ÜÓ[YOH[]]H]LKHØÚÈÛ\ÜÓ[YOHXÛÛ]HYLÈÜLKÌ][Û]K^KLKÌËMM^[]]YYÜYÜÝ[Ï[]YHÝ\[\ÜÝÛÜ\O^ÜÚÝÐÝ\[\ÜÝÛÜÈ	Ý^	È	Ü\ÜÝÛÜ	ßB[YO^ØÝ\[\ÜÝÛÜBÛÚ[ÙO^ÊJHOÙ]Ý\[\ÜÝÛÜ
-K\Ù][YJ_BÛ\ÜÓ[YOHLLLLÏ]Û\OH]ÛÛÛXÚÏ^Ê
-HOÙ]ÚÝÐÝ\[\ÜÝÛÜ
-\ÚÝÐÝ\[\ÜÝÛÜ
-_BÛ\ÜÓ[YOHXÛÛ]HYÚLÈÜLKÌ][Û]K^KLKÌ^[]]YYÜYÜÝ[ÜÚÝÐÝ\[\ÜÝÛÜÈ^YSÙÛ\ÜÓ[YOHËMMÏ^YHÛ\ÜÓ[YOHËMMÏBØ]ÛÙ]Ù]]X[[ÜH]Ô\ÜÝÛÜ]È\ÜÝÛÜÓX[]Û\ÜÓ[YOH[]]H]LKHØÚÈÛ\ÜÓ[YOHXÛÛ]HYLÈÜLKÌ][Û]K^KLKÌËMM^[]]YYÜYÜÝ[Ï[]YH]Ô\ÜÝÛÜ\O^ÜÚÝÓ]Ô\ÜÝÛÜÈ	Ý^	È	Ü\ÜÝÛÜ	ßB[YO^Û]Ô\ÜÝÛÜBÛÚ[ÙO^ÊJHOÙ]]Ô\ÜÝÛÜ
-K\Ù][YJ_BÛ\ÜÓ[YOHLLLLÏ]Û\OH]ÛÛÛXÚÏ^Ê
-HOÙ]ÚÝÓ]Ô\ÜÝÛÜ
-\ÚÝÓ]Ô\ÜÝÛÜ
-_BÛ\ÜÓ[YOHXÛÛ]HYÚLÈÜLKÌ][Û]K^KLKÌ^[]]YYÜYÜÝ[ÜÚÝÓ]Ô\ÜÝÛÜÈ^YSÙÛ\ÜÓ[YOHËMMÏ^YHÛ\ÜÓ[YOHËMMÏBØ]ÛÙ]Ù]]X[[ÜHÛÛ\T\ÜÝÛÜÛÛ\H]È\ÜÝÛÜÓX[]Û\ÜÓ[YOH[]]H]LKHØÚÈÛ\ÜÓ[YOHXÛÛ]HYLÈÜLKÌ][Û]K^KLKÌËMM^[]]YYÜYÜÝ[Ï[]YHÛÛ\T\ÜÝÛÜ\OH\ÜÝÛÜ[YO^ØÛÛ\T\ÜÝÛÜBÛÚ[ÙO^ÊJHOÙ]ÛÛ\T\ÜÝÛÜ
-K\Ù][YJ_BÛ\ÜÓ[YOHLLÏÙ]Ù]]Û\ÜÓ[YOHM]ÛÛÛXÚÏ^Ú[U\]T\ÜÝÛÜBÛ\ÜÓ[YOHËYÜYY[]Ë\ÛKZ[YÛËMLË\\KMØ]HÛ\ÜÓ[YOHËMM\LÏ\]H\ÜÝÛÜÐ]ÛÙ]Ù]Ù]ÕXÐÛÛ[ËÊY\[Ù\ÈX
-ßBXÐÛÛ[[YOHY\[Ù\ÈÛ\ÜÓ[YOH]M]Û\ÜÓ[YOHË\ÙXÛÛ\KÌÌÝ[YLMÈÛ\ÜÓ[YOH^[ÈÛ\Ù[ZXÛXM^][\ËXÙ[\Ø\LÙ][ÜÈÛ\ÜÓ[YOHËMHMH^\[X\HÏY\[Ù\ÂÚÏ]Û\ÜÓ[YOHÜXÙK^KM]Û\ÜÓ[YOH^][\ËXÙ[\\ÝYKX]ÙY[]Û\ÜÓ[YOH^][\ËXÙ[\Ø\LÈ[Û\ÜÓ[YOHËMHMH^[]]YYÜYÜÝ[Ï]]Û\ÜÓ[YOHÛ[YY][HÝYXØ][ÛÏÙ]]Û\ÜÓ[YOH^\ÛH^[]]YYÜYÜÝ[XÙZ]H[XZ[ÝYXØ][ÛÏÙ]Ù]Ù]ÝÚ]ÚÚXÚÙY^ÛÝYXØ][ÛßBÛÚXÚÙYÚ[ÙO^ÜÙ]ÝYXØ][ÛßBÏÙ]]Û\ÜÓ[YOH^][\ËXÙ[\\ÝYKX]ÙY[]Û\ÜÓ[YOH^][\ËXÙ[\Ø\LÈ[ÛÛÛ\ÜÓ[YOHËMHMH^[]]YYÜYÜÝ[Ï]]Û\ÜÓ[YOHÛ[YY][H\È[ÙOÙ]]Û\ÜÓ[YOH^\ÛH^[]]YYÜYÜÝ[\ÙH\È[YOÙ]Ù]Ù]ÝÚ]ÚÚXÚÙY^Ù\Ó[Ù_BÛÚXÚÙYÚ[ÙO^ÜÙ]\Ó[Ù_BÏÙ]]]Û\ÜÓ[YOH^][\ËXÙ[\Ø\LÈXLÈÛØHÛ\ÜÓ[YOHËMHMH^[]]YYÜYÜÝ[Ï]]Û\ÜÓ[YOHÛ[YY][H[ÝXYÙOÙ]]Û\ÜÓ[YOH^\ÛH^[]]YYÜYÜÝ[Ù[XÝ[Ý\Y\Y[ÝXYÙOÙ]Ù]Ù]Ù[XÝ[YO^Û[ÝXYÙ_BÛÚ[ÙO^ÊJHOÙ][ÝXYÙJK\Ù][YJ_BÛ\ÜÓ[YOHËY[ËXXÚÙÜÝ[Ü\Ü\XÜ\Ý[Y[ÈMKLÜ[Û[YOH[¼'áî¼'áî[Û\ÚÛÜ[ÛÜ[Û[YOH¼'áî|'áíÈ0ïðéÙOÛÜ[ÛÜ[Û[YOHH¼'áê|'áê]]ØÚÛÜ[ÛÜ[Û[YOH¼'áêü'áíÈ[°éØZ\ÏÛÜ[ÛÜ[Û[YOH\È¼'áê¼'áî\Üpì[ÛÛÜ[ÛÜ[Û[YOHH¼'áëü'áíH9¥éy§+:*§ÛÜ[ÛÜÙ[XÝÙ]]Û\ÜÓ[YOHM]ÛÛÛXÚÏ^Ú[U\]TY\[Ù\ßB6Æ74æÖSÒ&&rÖw&FVçB×Fò×"g&öÒÖæFvòÓSFò×W'ÆRÓc ¢à¢Å6fR6Æ74æÖSÒ'rÓBÓB×"Ó""óà¢6fR&VfW&Væ6W0¢Âô'WGFöãà¢ÂöFcà¢ÂöFcà¢ÂöFcà¢ÂõF'46öçFVçCà¢ÂõF'3à¢ÂöFcà¢ÂöFcà¢ÂöÖãà ¢Äfö÷FW"óà¢ÂöFcà¢°§Ð
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Profile Card */}
+          <div className="md:col-span-1">
+            <div className="bg-secondary/30 rounded-2xl p-6 text-center">
+              <img
+                src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name}&background=6366f1&color=fff&size=128`}
+                alt={user?.name}
+                className="w-24 h-24 rounded-full mx-auto mb-4 object-cover ring-4 ring-primary/20"
+              />
+              <h2 className="text-xl font-bold mb-1">{user?.name}</h2>
+              <p className="text-sm text-muted-foreground mb-4">{user?.email}</p>
+              <div className="flex flex-col gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => navigate('/saved')}
+                >
+                  <Bookmark className="w-4 h-4 mr-2" />
+                  Saved Articles
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-red-500 hover:text-red-600"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Profile Details */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Account Info */}
+            <div className="bg-secondary/30 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <Settings className="w-5 h-5" />
+                  Account Information
+                </h3>
+                {!editing ? (
+                  <Button variant="ghost" size="sm" onClick={() => setEditing(true)}>
+                    <Edit2 className="w-4 h-4 mr-1" /> Edit
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600" onClick={handleSave}>
+                      <Save className="w-4 h-4 mr-1" /> Save
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm text-muted-foreground flex items-center gap-1 mb-1">
+                    <User className="w-3.5 h-3.5" /> Full Name
+                  </label>
+                  {editing ? (
+                    <Input value={name} onChange={e => setName(e.target.value)} />
+                  ) : (
+                    <p className="font-medium">{user?.name}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm text-muted-foreground flex items-center gap-1 mb-1">
+                    <Mail className="w-3.5 h-3.5" /> Email
+                  </label>
+                  {editing ? (
+                    <Input type="email" value={email} onChange={e => setEmail(e.target.value)} />
+                  ) : (
+                    <p className="font-medium">{user?.email}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="bg-secondary/30 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                <Calendar className="w-5 h-5" />
+                Activity
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-background/50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold gradient-text">0</div>
+                  <div className="text-sm text-muted-foreground">Saved Articles</div>
+                </div>
+                <div className="bg-background/50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold gradient-text">0</div>
+                  <div className="text-sm text-muted-foreground">Comments</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}
