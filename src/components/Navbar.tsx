@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useGoogleLogin } from '@react-oauth/google';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -240,10 +241,21 @@ function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegist
     setLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
-    await loginWithGoogle();
-    onClose();
-  };
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        }).then(r => r.json());
+        await loginWithGoogle({ email: userInfo.email, name: userInfo.name, avatar: userInfo.picture });
+      } catch {
+        await loginWithGoogle();
+      }
+      onClose();
+    },
+    onError: () => { loginWithGoogle(); onClose(); },
+  });
+  const handleGoogleLogin = () => googleLogin();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -341,10 +353,21 @@ function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginC
     setLoading(false);
   };
 
-  const handleGoogleSignup = async () => {
-    await loginWithGoogle();
-    onClose();
-  };
+  const googleSignup = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        }).then(r => r.json());
+        await loginWithGoogle({ email: userInfo.email, name: userInfo.name, avatar: userInfo.picture });
+      } catch {
+        await loginWithGoogle();
+      }
+      onClose();
+    },
+    onError: () => { loginWithGoogle(); onClose(); },
+  });
+  const handleGoogleSignup = () => googleLogin();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
