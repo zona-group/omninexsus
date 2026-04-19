@@ -87,14 +87,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
           <div className="flex items-center gap-4">
             <Badge className="bg-red-500/20 text-red-400 border-red-500/30 shrink-0">
-              â¡ BREAKING
+              ⚡ BREAKING
             </Badge>
             <div className="overflow-hidden flex-1">
               <div className="flex gap-8 ticker-content whitespace-nowrap">
                 {[...breakingNews, ...breakingNews].map((news, i) => (
                   <span key={i} className="text-sm text-muted-foreground flex items-center gap-2">
                     {news}
-                    <span className="text-primary">â</span>
+                    <span className="text-primary">◆</span>
                   </span>
                 ))}
               </div>
@@ -285,7 +285,7 @@ export default function Home() {
               </div>
             ) : (
               <div className="empty-state">
-                <div className="empty-state-icon">ð</div>
+                <div className="empty-state-icon">🔍</div>
                 <div className="empty-state-title text-xl font-semibold mb-2">
                   No articles found
                 </div>
@@ -324,7 +324,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="text-lg">ð§</span>
+                      <span className="text-lg">📧</span>
                     </div>
                     <div>
                       <div className="text-sm text-foreground">Email</div>
@@ -342,7 +342,7 @@ export default function Home() {
                   </div>
                   <div className="flex items-center gap-3 text-muted-foreground">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="text-lg">â±</span>
+                      <span className="text-lg">⏱</span>
                     </div>
                     <div>
                       <div className="text-sm text-foreground">Response Time</div>
@@ -354,10 +354,10 @@ export default function Home() {
               <form className="space-y-4">
                 <div className="flex gap-2 mb-4">
                   <Button type="button" variant="secondary" size="sm" className="flex-1">
-                    ð¬ General Contact
+                    📬 General Contact
                   </Button>
                   <Button type="button" variant="ghost" size="sm" className="flex-1">
-                    ð¤ Partnership
+                    🤝 Partnership
                   </Button>
                 </div>
                 <input
