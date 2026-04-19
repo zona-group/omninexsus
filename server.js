@@ -74,7 +74,7 @@ http.createServer(async (req, res) => {
           <hr style="border:none;border-top:1px solid #27272a;margin:32px 0">
           <p style="color:#52525b;font-size:12px">© 2026 OmniNexus · <a href="${SITE_URL}" style="color:#6366f1;text-decoration:none">www.omninexsus.com</a></p>
         </div>`;
-      const ok = await sendEmail(email, 'OmniNexus'a Hoş Geldiniz! 🎉', html);
+      const ok = await sendEmail(email, "OmniNexus'a Hoş Geldiniz! 🎉", html);
       res.writeHead(ok ? 200 : 500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: ok }));
     } catch (e) {
