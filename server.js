@@ -30,7 +30,7 @@ async function sendEmail(to, subject, html) {
   });
   const data = await res.json();
   console.log('Email send result:', res.status, JSON.stringify(data));
-  return res.ok;
+  return { ok: res.ok, status: res.status, data };
 }
 
 function readBody(req) {
@@ -74,9 +74,9 @@ http.createServer(async (req, res) => {
           <hr style="border:none;border-top:1px solid #27272a;margin:32px 0">
           <p style="color:#52525b;font-size:12px">© 2026 OmniNexus · <a href="${SITE_URL}" style="color:#6366f1;text-decoration:none">www.omninexsus.com</a></p>
         </div>`;
-      const ok = await sendEmail(email, "OmniNexus'a Hoş Geldiniz! 🎉", html);
-      res.writeHead(ok ? 200 : 500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: ok }));
+      const result = await sendEmail(email, "OmniNexus'a Hoş Geldiniz! 🎉", html);
+      res.writeHead(result.ok ? 200 : 500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: result.ok, resendData: result.data }));
     } catch (e) {
       console.error('Welcome email error:', e);
       res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -110,9 +110,9 @@ http.createServer(async (req, res) => {
           <hr style="border:none;border-top:1px solid #27272a;margin:32px 0">
           <p style="color:#52525b;font-size:12px">© 2026 OmniNexus · <a href="${SITE_URL}" style="color:#6366f1;text-decoration:none">www.omninexsus.com</a></p>
         </div>`;
-      const ok = await sendEmail(email, 'OmniNexus - Şifre Sıfırlama Talebi', html);
-      res.writeHead(ok ? 200 : 500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: ok }));
+      const result = await sendEmail(email, 'OmniNexus - Şifre Sıfırlama Talebi', html);
+      res.writeHead(result.ok ? 200 : 500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: result.ok, resendData: result.data }));
     } catch (e) {
       console.error('Reset email error:', e);
       res.writeHead(500, { 'Content-Type': 'application/json' });
