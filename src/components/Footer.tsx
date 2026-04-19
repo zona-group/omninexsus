@@ -149,7 +149,7 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
-              Â© 2025 OmniNexus. All rights reserved.
+              © 2026 OmniNexus. All rights reserved.
             </span>
             <button
               onClick={scrollToTop}
