@@ -52,7 +52,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </div>
             <div>
               <div className="font-bold text-lg gradient-text">OmniNexus</div>
-              <div className="text-xs text-muted-foreground">Live Â· Global</div>
+              <div className="text-xs text-muted-foreground">Live · Global</div>
             </div>
           </Link>
 
@@ -79,12 +79,12 @@ export default function Navbar({ onSearch }: NavbarProps) {
           <div className="flex items-center gap-2">
             {/* Language Selector */}
             <select className="hidden sm:block bg-transparent text-sm text-muted-foreground border border-border/50 rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary">
-              <option value="en">ðºð¸ EN</option>
-              <option value="tr">ð¹ð· TR</option>
-              <option value="de">ð©ðª DE</option>
-              <option value="fr">ð«ð· FR</option>
-              <option value="es">ðªð¸ ES</option>
-              <option value="ja">ð¯ðµ JA</option>
+              <option value="en">🇺🇸 EN</option>
+              <option value="tr">🇹🇷 TR</option>
+              <option value="de">🇩🇪 DE</option>
+              <option value="fr">🇫🇷 FR</option>
+              <option value="es">🇪🇸 ES</option>
+              <option value="ja">🇯🇵 JA</option>
             </select>
 
             {/* Contact Link */}
@@ -92,7 +92,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
               to="/#contact"
               className="hidden md:block text-sm text-muted-foreground hover:text-primary transition-colors px-3 py-1.5 border border-border/50 rounded-lg"
             >
-              Ä°letiÅim
+              İletişim
             </Link>
 
             {/* Auth Buttons */}
