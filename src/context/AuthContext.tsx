@@ -5,7 +5,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  loginWithGoogle: () => Promise<boolean>;
+  loginWithGoogle: (userData?: { email: string; name: string; avatar: string }) => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<boolean>;
@@ -39,12 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  const loginWithGoogle = async (): Promise<boolean> => {
-    const mockUser: User = {
+  const loginWithGoogle = async (userData?: { email: string; name: string; avatar: string }): Promise<boolean> => {
+    const googleUser: User = {
       id: 'google_' + Date.now(),
-      email: 'user@gmail.com',
-      name: 'Google User',
-      avatar: 'https://ui-avatars.com/api/?name=Google+User&background=6366f1&color=fff',
+      email: userData?.email || 'user@gmail.com',
+      name: userData?.name || 'Google User',
+      avatar: userData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || 'Google+User')}&background=6366f1&color=fff`,
       createdAt: new Date().toISOString(),
       preferences: {
         language: 'en',
@@ -52,8 +52,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         theme: 'dark'
       }
     };
-    setUser(mockUser);
-    localStorage.setItem('omni_user', JSON.stringify(mockUser));
+    setUser(googleUser);
+    localStorage.setItem('omni_user', JSON.stringify(googleUser));
+    if (userData?.email) {
+      fetch('/api/email/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: googleUser.name, email: googleUser.email }),
+      }).catch(() => {});
+    }
     return true;
   };
 
