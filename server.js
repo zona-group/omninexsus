@@ -143,21 +143,30 @@ http.createServer(async (req, res) => {
                                                   try { publishedAt = new Date(pubDateMatch[1].trim()).toISOString(); } catch (e) {}
                                       }
 
-                // Description - decode entities and strip HTML tags
-                const descMatch = itemXml.match(/<description>([\s\S]*?)<\/description>/);
-                                      let description = descMatch ? descMatch[1] : '';
-                                      description = description
-                                        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
-                                      description = description.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-                                      if (description.length > 300) description = description.substring(0, 297) + '...';
-                                      if (!description || description.length < 10) description = title;
+                // Description - decode entities, extract image, then strip HTML
+        const descMatch = itemXml.match(/<description>([\s\S]*?)<\/description>/);
+        let rawDesc = descMatch ? descMatch[1] : '';
+        rawDesc = rawDesc
+          .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
+        // Extract image from description <img> tag before stripping HTML
+        let urlToImage = FALLBACK_IMAGES[validCat] || FALLBACK_IMAGES.general;
+        const imgTagMatch = rawDesc.match(/<img[^>]+src=["']([^"']+)["']/i);
+        if (imgTagMatch && imgTagMatch[1] && !imgTagMatch[1].includes('1x1')) {
+          urlToImage = imgTagMatch[1];
+        }
+        // Also check media:thumbnail in item XML
+        const mediaThumbnailMatch = itemXml.match(/<media:thumbnail[^>]+url=["']([^"']+)["']/i);
+        if (mediaThumbnailMatch) urlToImage = mediaThumbnailMatch[1];
+        let description = rawDesc.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        if (description.length > 300) description = description.substring(0, 297) + '...';
+        if (!description || description.length < 10) description = title;
 
-                items.push({
-                            id: 'gnews_' + validCat + '_' + idx,
-                            title,
-                            description,
-                            url: link,
-                            urlToImage: FALLBACK_IMAGES[validCat] || FALLBACK_IMAGES.general,
+        items.push({
+          id: 'gnews_' + validCat + '_' + idx,
+          title,
+          description,
+          url: link,
+          urlToImage,
                             publishedAt,
                             source: { name: sourceName },
                             author: sourceName,
