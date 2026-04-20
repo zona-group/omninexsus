@@ -32,15 +32,71 @@ const GNEWS_RSS = {
     entertainment: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNREpxYW5RU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',
 };
 
-const FALLBACK_IMAGES = {
-    general: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800',
-    technology: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
-    business: 'https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800',
-    science: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=800',
-    health: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800',
-    sports: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800',
-    entertainment: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800',
+// Image pools per category - picked by title hash for variety
+const IMAGE_POOLS = {
+  general: [
+    'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800',
+    'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800',
+    'https://images.unsplash.com/photo-1557992260-ec58e38d363c?w=800',
+    'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800',
+    'https://images.unsplash.com/photo-1598128558393-70ff21433be0?w=800',
+    'https://images.unsplash.com/photo-1526378800651-c32d170fe6f8?w=800',
+  ],
+  technology: [
+    'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800',
+    'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800',
+    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800',
+    'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800',
+    'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800',
+  ],
+  business: [
+    'https://images.unsplash.com/photo-1611974765270-ca1258634369?w=800',
+    'https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?w=800',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800',
+    'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
+    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800',
+  ],
+  science: [
+    'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=800',
+    'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800',
+    'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800',
+    'https://images.unsplash.com/photo-1532094349884-543559921766?w=800',
+    'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800',
+    'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800',
+  ],
+  health: [
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800',
+    'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=800',
+    'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=800',
+    'https://images.unsplash.com/photo-1526256262350-7da7584cf5eb?w=800',
+    'https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?w=800',
+    'https://images.unsplash.com/photo-1474631245212-32dc3c8310c6?w=800',
+  ],
+  sports: [
+    'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800',
+    'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800',
+    'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800',
+    'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800',
+    'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800',
+    'https://images.unsplash.com/photo-1567879640-87bcfe9459aa?w=800',
+  ],
+  entertainment: [
+    'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800',
+    'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800',
+    'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
+    'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800',
+    'https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=800',
+    'https://images.unsplash.com/photo-1499364615650-ec38552f4f34?w=800',
+  ],
 };
+function pickImage(category, title) {
+  const pool = IMAGE_POOLS[category] || IMAGE_POOLS.general;
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) { hash = (hash * 31 + title.charCodeAt(i)) & 0xffffffff; }
+  return pool[Math.abs(hash) % pool.length];
+}
 
 async function sendEmail(to, subject, html) {
     const res = await fetch('https://api.resend.com/emails', {
@@ -149,7 +205,7 @@ http.createServer(async (req, res) => {
         rawDesc = rawDesc
           .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"');
         // Extract image from description <img> tag before stripping HTML
-        let urlToImage = FALLBACK_IMAGES[validCat] || FALLBACK_IMAGES.general;
+        let urlToImage = pickImage(validCat, title);
         const imgTagMatch = rawDesc.match(/<img[^>]+src=["']([^"']+)["']/i);
         if (imgTagMatch && imgTagMatch[1] && !imgTagMatch[1].includes('1x1')) {
           urlToImage = imgTagMatch[1];
