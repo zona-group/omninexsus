@@ -32,7 +32,7 @@ const MOCK_ARTICLES: Article[] = [
     publishedAt: new Date().toISOString(),
     source: { name: 'Financial Times' },
     author: 'John Smith',
-    content: 'Global stock markets have reached unprecedented levels as artificial intelligence continues to drive innovation across sectors. The S&P 500 and Nasdaq both closed at record highs...',
+    content: 'Global stock markets have reached unprecedented levels...',
     category: 'business'
   },
   {
@@ -44,20 +44,20 @@ const MOCK_ARTICLES: Article[] = [
     publishedAt: new Date(Date.now() - 86400000).toISOString(),
     source: { name: 'BBC News' },
     author: 'Sarah Johnson',
-    content: 'In a historic move, 120 nations have signed a new climate accord aiming to reduce global carbon emissions by 50% before 2030...',
+    content: 'In a historic move, 120 nations have signed a new climate accord...',
     category: 'science'
   },
   {
     id: '3',
-    title: 'SpaceX Starship completes lunar mission',
-    description: 'Historic mission marks first successful commercial lunar landing.',
+    title: 'Tech giants unveil next-gen AI assistants',
+    description: 'New AI models promise unprecedented capabilities in natural language understanding.',
     url: 'https://example.com/article3',
-    urlToImage: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=800',
+    urlToImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
     publishedAt: new Date(Date.now() - 172800000).toISOString(),
-    source: { name: 'Space.com' },
-    author: 'Mike Chen',
-    content: 'SpaceX Starship has successfully completed its lunar mission, marking the first successful commercial lunar landing in history...',
-    category: 'science'
+    source: { name: 'TechCrunch' },
+    author: 'Alex Wilson',
+    content: 'Major tech companies have unveiled their next-generation AI assistants...',
+    category: 'technology'
   },
   {
     id: '4',
@@ -68,79 +68,31 @@ const MOCK_ARTICLES: Article[] = [
     publishedAt: new Date(Date.now() - 259200000).toISOString(),
     source: { name: 'Medical News Today' },
     author: 'Dr. Emily Brown',
-    content: 'The World Health Organization has announced a breakthrough cancer treatment showing 90% success rate in clinical trials...',
+    content: 'The World Health Organization has announced a breakthrough cancer treatment...',
     category: 'health'
   },
   {
     id: '5',
-    title: 'Tech giants unveil next-gen AI assistants',
-    description: 'New AI models promise unprecedented capabilities in natural language understanding.',
-    url: 'https://example.com/article5',
-    urlToImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
-    publishedAt: new Date(Date.now() - 345600000).toISOString(),
-    source: { name: 'TechCrunch' },
-    author: 'Alex Wilson',
-    content: 'Major tech companies have unveiled their next-generation AI assistants, promising unprecedented capabilities...',
-    category: 'technology'
-  },
-  {
-    id: '6',
-    title: 'Global GDP growth surpasses 4% forecast',
-    description: 'Economic recovery continues stronger than expected across major economies.',
-    url: 'https://example.com/article6',
-    urlToImage: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800',
-    publishedAt: new Date(Date.now() - 432000000).toISOString(),
-    source: { name: 'Reuters' },
-    author: 'Maria Garcia',
-    content: 'Global GDP growth has surpassed the 4% forecast, with economic recovery continuing stronger than expected...',
-    category: 'business'
-  },
-  {
-    id: '7',
-    title: 'Historic NASA Moon mission returns safely to Earth',
-    description: 'Artemis voyage entranced world and highlighted space race between US and China.',
-    url: 'https://example.com/article7',
-    urlToImage: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800',
-    publishedAt: new Date().toISOString(),
-    source: { name: 'NASA' },
-    author: 'Dr. Robert Lee',
-    content: "NASA's historic Moon mission has returned safely to Earth, marking a significant milestone in space exploration...",
-    category: 'science'
-  },
-  {
-    id: '8',
-    title: 'Revolutionary quantum computer achieves milestone',
-    description: 'Scientists demonstrate quantum supremacy with 1000-qubit processor.',
-    url: 'https://example.com/article8',
-    urlToImage: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800',
-    publishedAt: new Date(Date.now() - 518400000).toISOString(),
-    source: { name: 'Nature' },
-    author: 'Prof. David Kim',
-    content: 'Scientists have achieved a major milestone in quantum computing with a 1000-qubit processor demonstrating quantum supremacy...',
-    category: 'technology'
-  },
-  {
-    id: '9',
     title: 'Champions League final sets viewership record',
     description: 'Over 500 million viewers tuned in for the historic final.',
-    url: 'https://example.com/article9',
+    url: 'https://example.com/article5',
     urlToImage: 'https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?w=800',
-    publishedAt: new Date(Date.now() - 604800000).toISOString(),
+    publishedAt: new Date(Date.now() - 345600000).toISOString(),
     source: { name: 'ESPN' },
     author: 'Tom Bradley',
-    content: 'The Champions League final has set a new viewership record with over 500 million viewers tuning in...',
+    content: 'The Champions League final has set a new viewership record...',
     category: 'sports'
   },
   {
-    id: '10',
+    id: '6',
     title: 'New Marvel movie breaks box office records',
     description: 'Latest superhero film earns $500 million in opening weekend.',
-    url: 'https://example.com/article10',
+    url: 'https://example.com/article6',
     urlToImage: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800',
-    publishedAt: new Date(Date.now() - 691200000).toISOString(),
+    publishedAt: new Date(Date.now() - 432000000).toISOString(),
     source: { name: 'Variety' },
     author: 'Lisa Anderson',
-    content: 'The latest Marvel movie has broken box office records, earning $500 million in its opening weekend...',
+    content: 'The latest Marvel movie has broken box office records...',
     category: 'entertainment'
   }
 ];
@@ -167,11 +119,20 @@ export function NewsProvider({ children }: { children: React.ReactNode }) {
 
   const loadArticles = async (category?: Category, _page: number = 1) => {
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    if (category && category !== 'general') {
-      const filtered = MOCK_ARTICLES.filter(a => a.category === category);
-      setArticles(filtered);
-    } else {
+    try {
+      const cat = category || 'general';
+      const response = await fetch(`/api/news?category=${cat}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setArticles(data);
+        } else {
+          setArticles(MOCK_ARTICLES);
+        }
+      } else {
+        setArticles(MOCK_ARTICLES);
+      }
+    } catch {
       setArticles(MOCK_ARTICLES);
     }
     setLoading(false);
@@ -180,13 +141,34 @@ export function NewsProvider({ children }: { children: React.ReactNode }) {
   const searchArticles = async (query: string) => {
     setLoading(true);
     setSearchQuery(query);
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const results = MOCK_ARTICLES.filter(article =>
-      article.title.toLowerCase().includes(query.toLowerCase()) ||
-      article.description.toLowerCase().includes(query.toLowerCase()) ||
-      article.source.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setSearchResults(results);
+    try {
+      const response = await fetch(`/api/news?category=general&q=${encodeURIComponent(query)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const filtered = data.filter((article: Article) =>
+            article.title.toLowerCase().includes(query.toLowerCase()) ||
+            article.description.toLowerCase().includes(query.toLowerCase())
+          );
+          setSearchResults(filtered.length > 0 ? filtered : data);
+        } else {
+          setSearchResults(MOCK_ARTICLES.filter(article =>
+            article.title.toLowerCase().includes(query.toLowerCase()) ||
+            article.description.toLowerCase().includes(query.toLowerCase())
+          ));
+        }
+      } else {
+        setSearchResults(MOCK_ARTICLES.filter(article =>
+          article.title.toLowerCase().includes(query.toLowerCase()) ||
+          article.description.toLowerCase().includes(query.toLowerCase())
+        ));
+      }
+    } catch {
+      setSearchResults(MOCK_ARTICLES.filter(article =>
+        article.title.toLowerCase().includes(query.toLowerCase()) ||
+        article.description.toLowerCase().includes(query.toLowerCase())
+      ));
+    }
     setLoading(false);
   };
 
