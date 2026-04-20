@@ -105,20 +105,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const forgotPassword = async (email: string): Promise<boolean> => {
+    // Always allow reset - don't gate on localStorage (MySQL users won't be there)
+    const resetToken = 'reset_' + Date.now();
+    localStorage.setItem('omni_reset_token', JSON.stringify({ email, token: resetToken }));
     const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
     const foundUser = mockUsers.find((u: any) => u.email === email);
-    
-    if (foundUser) {
-      const resetToken = 'reset_' + Date.now();
-      localStorage.setItem('omni_reset_token', JSON.stringify({ email, token: resetToken }));
-      fetch('/api/email/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, token: resetToken, name: foundUser.name }),
-      }).catch(() => {});
-      return true;
-    }
-    return false;
+    const userName = foundUser?.name || email.split('@')[0];
+    fetch('/api/email/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, token: resetToken, name: userName }),
+    }).catch(() => {});
+    return true;
   };
 
   const resetPassword = async (token: string, newPassword: string): Promise<boolean> => {
