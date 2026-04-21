@@ -107,7 +107,7 @@ const IMAGE_POOLS = {
     'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800',
     'https://images.unsplash.com/photo-1567879640-87bcfe9459aa?w=800',
   ],
-;
+};
 function pickImage(category, title) {
   const pool = IMAGE_POOLS[category] || IMAGE_POOLS.general;
   let hash = 0;
