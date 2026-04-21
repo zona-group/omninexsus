@@ -45,7 +45,7 @@ const MOCK_ARTICLES: Article[] = [
     source: { name: 'BBC News' },
     author: 'Sarah Johnson',
     content: 'In a historic move, 120 nations have signed a new climate accord...',
-    category: 'science'
+    category: 'gaming'
   },
   {
     id: '3',
@@ -69,7 +69,7 @@ const MOCK_ARTICLES: Article[] = [
     source: { name: 'Medical News Today' },
     author: 'Dr. Emily Brown',
     content: 'The World Health Organization has announced a breakthrough cancer treatment...',
-    category: 'health'
+    category: 'hardware'
   },
   {
     id: '5',
@@ -93,7 +93,7 @@ const MOCK_ARTICLES: Article[] = [
     source: { name: 'Variety' },
     author: 'Lisa Anderson',
     content: 'The latest Marvel movie has broken box office records...',
-    category: 'entertainment'
+    category: 'sports'
   }
 ];
 
