@@ -15,6 +15,7 @@ import Admin from '@/pages/Admin';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import SearchResults from '@/pages/SearchResults';
+import EditorPanel from '@/pages/EditorPanel';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/search" element={<SearchResults />} />
+                          <Route path="/editor" element={<EditorPanel />} />
           </Routes>
           <Sonner />
         </NewsProvider>

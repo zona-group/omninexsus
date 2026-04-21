@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, User, Bookmark, Settings, LogOut, Menu, X, Shield } from 'lucide-react';
+import { Search, User, Bookmark, Settings, LogOut, Menu, X, Shield, Twitter, Facebook, Instagram, Linkedin, Youtube } from 'lucide-react';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -118,15 +118,11 @@ export default function Navbar({ onSearch }: NavbarProps) {
           </form>
 
           <div className="flex items-center gap-2">
-            <select className="hidden sm:block bg-transparent text-sm text-muted-foreground border border-border/50 rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary">
-              <option value="en">🇺🇸 EN</option>
-              <option value="tr">🇹🇷 TR</option>
-              <option value="de">🇩🇪 DE</option>
-              <option value="fr">🇫🇷 FR</option>
-              <option value="es">🇪🇸 ES</option>
-              <option value="ja">🇯🇵 JA</option>
-            </select>
-
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Twitter className="w-4 h-4" /></a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Facebook className="w-4 h-4" /></a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Instagram className="w-4 h-4" /></a>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Linkedin className="w-4 h-4" /></a>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Youtube className="w-4 h-4" /></a>>
             <Link
               to="/#contact"
               className="hidden md:block text-sm text-muted-foreground hover:text-primary transition-colors px-3 py-1.5 border border-border/50 rounded-lg"

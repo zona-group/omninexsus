@@ -23,6 +23,8 @@ const newsCache = {};
 const NEWS_CACHE_TTL = 5 * 60 * 1000;
 
 const ogImageCache = {};
+const welcomedEmails = new Set();
+const userArticles = [];
 
 async function fetchOGImage(url, fallback, timeoutMs = 4000) {
   if (ogImageCache[url]) return ogImageCache[url];
@@ -270,6 +272,12 @@ http.createServer(async (req, res) => {
                     if (req.method === 'POST' && url === '/api/email/welcome') {
                           try {
                                   const { name, email } = JSON.parse(await readBody(req));
+                                          if (welcomedEmails.has(email)) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true, alreadySent: true }));
+          return;
+        }
+        welcomedEmails.add(email);
                                   const html = `
                                           <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#0f0f1a;color:#fff;padding:40px;border-radius:12px">
                                                     <div style="margin-bottom:24px">
@@ -329,7 +337,25 @@ http.createServer(async (req, res) => {
                           return;
                     }
 
-                    // Static file serving (React build)
+  // User-submitted articles
+                        if (req.method === 'POST' && url === '/api/articles') {
+    try {
+      const body = JSON.parse(await readBody(req));
+      const article = { id: Date.now().toString(), title: body.title, category: body.category, urlToImage: body.imageUrl || '', content: body.content, author: body.author || 'Editor', publishedAt: new Date().toISOString(), url: '' };
+      userArticles.unshift(article);
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, article }));
+    } catch (e) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: false, error: e.message }));
+    }
+    return;
+  }
+  if (req.method === 'GET' && url === '/api/articles') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(userArticles));
+    return;
+  }
                     let fp = path.join(__dirname, 'dist', url === '/' ? 'index.html' : url);
     if (!fs.existsSync(fp) || fs.statSync(fp).isDirectory()) {
           fp = path.join(__dirname, 'dist', 'index.html');

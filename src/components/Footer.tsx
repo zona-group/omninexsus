@@ -84,7 +84,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/?cat=science" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/?cat=gamingconst userArticles = [];" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Science
                 </Link>
               </li>
