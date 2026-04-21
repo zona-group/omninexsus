@@ -43,7 +43,7 @@ export interface SearchResult {
   totalResults: number
 }
 
-export type Category = 'general' | 'technology' | 'business' | 'science' | 'health' | 'sports' | 'entertainment'
+export type Category = 'general' | 'technology' | 'business' | 'gaming' | 'hardware' | 'sports'
 
 export interface CategoryInfo {
   id: Category
