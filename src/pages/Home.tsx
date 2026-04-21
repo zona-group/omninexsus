@@ -16,10 +16,9 @@ import {
   TrendingUp,
   Cpu,
   Briefcase,
-  FlaskConical,
-  Heart,
   Trophy,
-  Film,
+  Gamepad2,
+  HardDrive,
   ChevronDown
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,10 +28,9 @@ const categories: { id: Category; name: string; icon: React.ReactNode }[] = [
   { id: 'general', name: 'Top Stories', icon: <TrendingUp className="w-4 h-4" /> },
   { id: 'technology', name: 'Technology', icon: <Cpu className="w-4 h-4" /> },
   { id: 'business', name: 'Business', icon: <Briefcase className="w-4 h-4" /> },
-  { id: 'science', name: 'Science', icon: <FlaskConical className="w-4 h-4" /> },
-  { id: 'health', name: 'Health', icon: <Heart className="w-4 h-4" /> },
   { id: 'sports', name: 'Sports', icon: <Trophy className="w-4 h-4" /> },
-  { id: 'entertainment', name: 'Entertainment', icon: <Film className="w-4 h-4" /> },
+  { id: 'gaming', name: 'Gaming', icon: <Gamepad2 className="w-4 h-4" /> },
+  { id: 'hardware', name: 'PC Hardware', icon: <HardDrive className="w-4 h-4" /> },
 ];
 
 const breakingNews = [
@@ -352,14 +350,6 @@ export default function Home() {
                 </div>
               </div>
               <form className="space-y-4">
-                <div className="flex gap-2 mb-4">
-                  <Button type="button" variant="secondary" size="sm" className="flex-1">
-                    📬 General Contact
-                  </Button>
-                  <Button type="button" variant="ghost" size="sm" className="flex-1">
-                    🤝 Partnership
-                  </Button>
-                </div>
                 <input
                   type="text"
                   placeholder="Your Name"
