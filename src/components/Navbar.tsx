@@ -122,7 +122,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Facebook className="w-4 h-4" /></a>
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Instagram className="w-4 h-4" /></a>
             <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Linkedin className="w-4 h-4" /></a>
-            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Youtube className="w-4 h-4" /></a>>
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Youtube className="w-4 h-4" /></a>
             <Link
               to="/#contact"
               className="hidden md:block text-sm text-muted-foreground hover:text-primary transition-colors px-3 py-1.5 border border-border/50 rounded-lg"
