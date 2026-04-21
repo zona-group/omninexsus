@@ -22,6 +22,32 @@ const mime = {
 const newsCache = {};
 const NEWS_CACHE_TTL = 5 * 60 * 1000;
 
+const ogImageCache = {};
+
+async function fetchOGImage(url, fallback, timeoutMs = 4000) {
+  if (ogImageCache[url]) return ogImageCache[url];
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    const resp = await fetch(url, {
+      signal: ctrl.signal,
+      redirect: 'follow',
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' },
+    });
+    clearTimeout(timer);
+    const html = await resp.text();
+    const m = html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+           || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i)
+           || html.match(/<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']/i)
+           || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image["']/i);
+    const img = (m && m[1] && m[1].startsWith('http')) ? m[1] : fallback;
+    ogImageCache[url] = img;
+    return img;
+  } catch (e) {
+    return fallback;
+  }
+}
+
 const GNEWS_RSS = {
     general: 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en',
     technology: 'https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGRqTVhZU0FtVnVHZ0pWVXlBQVAB?hl=en-US&gl=US&ceid=US:en',
@@ -232,7 +258,13 @@ http.createServer(async (req, res) => {
                                       idx++;
                             }
 
-                            newsCache[validCat] = { data: items, time: Date.now() };
+                            // Fetch real og:image for each article in parallel
+  const imageResults = await Promise.all(
+    items.map(item => fetchOGImage(item.url, pickImage(validCat, item.title)))
+  );
+  items = items.map((item, i) => ({ ...item, urlToImage: imageResults[i] }));
+
+  newsCache[validCat] = { data: items, time: Date.now() };
               res.writeHead(200, { 'Content-Type': 'application/json' });
               res.end(JSON.stringify(items));
       } catch (e) {
