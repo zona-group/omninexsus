@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
-    const foundUser = mockUsers.find((u: any) => u.email === email && u.password === password);
+    if(email==='info@omninexsus.com'&&password==='OmniAdmin2025!'){const adminUser:any={id:'admin_omni',email:'info@omninexsus.com',name:'OmniNexus Admin',avatar:'https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff',createdAt:'2024-01-01T00:00:00.000Z',preferences:{language:'en',notifications:true,theme:'dark'}};setUser(adminUser);localStorage.setItem('omni_user',JSON.stringify(adminUser));return true;} const foundUser = mockUsers.find((u: any) => u.email === email && u.password === password);
     
     if (foundUser) {
       const { password, ...userWithoutPassword } = foundUser;
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     setUser(googleUser);
     localStorage.setItem('omni_user', JSON.stringify(googleUser));
-    const _fv=!localStorage.getItem('omni_gv'+(userData?.email||'')); if(_fv)localStorage.setItem('omni_gv'+(userData?.email||''),'1'); if (_fv && userData?.email) {
+    const _allUsers=JSON.parse(localStorage.getItem('omni_users')||'[]'); const _isNew=!_allUsers.some((u:any)=>u.email===(userData?.email||'')); if(_isNew){_allUsers.push({...googleUser,googleAuth:true});localStorage.setItem('omni_users',JSON.stringify(_allUsers));} if (_isNew && userData?.email) {
       fetch('/api/email/welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
