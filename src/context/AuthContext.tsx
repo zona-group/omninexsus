@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
     setUser(googleUser);
     localStorage.setItem('omni_user', JSON.stringify(googleUser));
-    if (userData?.email) {
+    const _fv=!localStorage.getItem('omni_gv'+(userData?.email||'')); if(_fv)localStorage.setItem('omni_gv'+(userData?.email||''),'1'); if (_fv && userData?.email) {
       fetch('/api/email/welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

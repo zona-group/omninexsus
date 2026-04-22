@@ -117,6 +117,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
             </div>
           </form>
 
+
           <div className="flex items-center gap-2">
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Twitter className="w-4 h-4" /></a>
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hidden sm:flex"><Facebook className="w-4 h-4" /></a>
@@ -159,7 +160,7 @@ export default function Navbar({ onSearch }: NavbarProps) {
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                  <DropdownMenuItem className={user?.email !== 'info@omninexsus.com' ? 'hidden' : ''} onClick={() => navigate('/admin')}>
                     <Shield className="mr-2 h-4 w-4" />
                     Admin Panel
                   </DropdownMenuItem>

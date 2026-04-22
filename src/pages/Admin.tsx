@@ -17,20 +17,20 @@ import {
   Eye,
   Search,
   Trash2,
-  Ban,
+
   CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Admin() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { articles, savedArticles, comments } = useNews();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('dashboard'); const [editorEmails, setEditorEmails] = useState<string[]>(JSON.parse(localStorage.getItem('omni_editors') || '[]')); const toggleEditor = (email: string) => { const newList = editorEmails.includes(email) ? editorEmails.filter((e: string) => e !== email) : [...editorEmails, email]; setEditorEmails(newList); localStorage.setItem('omni_editors', JSON.stringify(newList)); toast.success(newList.includes(email) ? 'Editor role granted' : 'Editor role removed'); };
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || user?.email !== 'info@omninexsus.com') {
       toast.error('Please login to access admin panel');
       navigate('/');
     }
@@ -48,14 +48,9 @@ export default function Admin() {
   };
 
   // Mock users data
-  const mockUsers = [
-    { id: '1', name: 'John Doe', email: 'john@example.com', role: 'user', status: 'active', joined: '2025-01-15' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'user', status: 'active', joined: '2025-02-20' },
-    { id: '3', name: 'Admin User', email: 'admin@omninexsus.com', role: 'admin', status: 'active', joined: '2024-12-01' },
-    { id: '4', name: 'Bob Wilson', email: 'bob@example.com', role: 'user', status: 'banned', joined: '2025-03-05' },
-  ];
+  const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]').map((u: any) => ({ id: u.id, name: u.name, email: u.email, role: editorEmails.includes(u.email) ? 'editor' : 'user', status: 'active', joined: u.createdAt ? u.createdAt.split('T')[0] : '2025-01-01' }));
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || user?.email !== 'info@omninexsus.com') {
     return null;
   }
 
@@ -282,7 +277,7 @@ export default function Admin() {
                           <td className="py-3 px-4">
                             <div className="flex gap-2">
                               <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <Ban className="w-4 h-4" />
+                                <CheckCircle className={editorEmails.includes(user.email) ? 'w-4 h-4 text-green-500' : 'w-4 h-4'} onClick={(e)=>{e.stopPropagation();toggleEditor(user.email)}} style={{cursor:'pointer'}}/>
                               </Button>
                               <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500">
                                 <Trash2 className="w-4 h-4" />
