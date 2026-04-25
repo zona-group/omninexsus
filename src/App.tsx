@@ -16,6 +16,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import SearchResults from '@/pages/SearchResults';
 import EditorPanel from '@/pages/EditorPanel';
+import GoogleCallback from '@/pages/GoogleCallback';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/search" element={<SearchResults />} />
                           <Route path="/editor" element={<EditorPanel />} />
+                        <Route path="/auth/google/callback" element={<GoogleCallback />} />
           </Routes>
           <Sonner />
         </NewsProvider>
