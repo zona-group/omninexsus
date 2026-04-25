@@ -221,7 +221,7 @@ if (req.method === 'POST' && url === '/api/auth/google') {
                             if (!rssRes.ok) throw new Error('RSS fetch failed: ' + rssRes.status);
               const xml = await rssRes.text();
 
-                            const items = [];
+                            let items = [];
               const itemRegex = /<item>([\s\S]*?)<\/item>/g;
               let match;
               let idx = 0;
@@ -365,7 +365,7 @@ if (req.method === 'POST' && url === '/api/auth/google') {
                                                                                                                                           <a href="${resetUrl}" style="display:inline-block;margin-top:28px;padding:14px 36px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px">
                                                                                                                                                       Sifremi Sifirla
                                                                                                                                                                 </a>
-                                                                                                                                                                          <p style="color:#71717a;margin-top:24px;font-size:13px">Bu baglantiyi siz yapmadıysanız bu e-postayı görmezden gelebilirsiniz.</p>
+                                                                                                                                                                          <p style="color:#71717a;margin-top:24px;font-size:13px">Bu baglantiyi siz yapmadÄ±ysanÄ±z bu e-postayÄ± gÃ¶rmezden gelebilirsiniz.</p>
                                                                                                                                                                                     <hr style="border:none;border-top:1px solid #27272a;margin:32px 0">
                                                                                                                                                                                               <p style="color:#52525b;font-size:12px">2026 OmniNexus - <a href="${SITE_URL}" style="color:#6366f1;text-decoration:none">www.omninexsus.com</a></p>
                                                                                                                                                                                                       </div>`;
