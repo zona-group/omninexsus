@@ -49,9 +49,9 @@ export default function GoogleCallback() {
   return (
             <div className="flex items-center justify-center h-screen bg-background">
                   <div className="text-center">
-                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>div>
-                          <p className="text-muted-foreground">Google ile giriş yapılıyor...</p>p>
-                  </div>div>
-            </div>div>
+                          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto mb-4"></div>
+                          <p className="text-muted-foreground">Google ile giriÅ yapÄ±lÄ±yor...</p>
+                  </div>
+            </div>
           );
 }</div>
