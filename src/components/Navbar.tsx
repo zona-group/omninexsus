@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuContent,h
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -57,7 +57,7 @@ function GoogleOAuthButton({
         window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
   };
   return (
-    <Button type="button" variant="outline" className="w-full" onClick={(handleGoogleRedirect}>
+    <Button type="button" variant="outline" className="w-full" onClick={handleGoogleRedirect}>
       {googleIconSvg}
       {label}
     </Button>
