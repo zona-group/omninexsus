@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useGoogleLogin } from '@react-oauth/google';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -44,22 +43,21 @@ function GoogleOAuthButton({
   onGoogleSuccess: (userData: { email: string; name: string; avatar: string }) => void;
   onGoogleFallback: () => void;
 }) {
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      try {
-        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
-        }).then((r) => r.json());
-        onGoogleSuccess({ email: userInfo.email, name: userInfo.name, avatar: userInfo.picture });
-      } catch {
-        onGoogleFallback();
-      }
-    },
-    onError: () => onGoogleFallback(),
-  });
-
+  const handleGoogleRedirect = () => {
+        if (!GOOGLE_CLIENT_ID) {
+                onGoogleFallback();
+                return;
+        }
+        const params = new URLSearchParams({
+                client_id: GOOGLE_CLIENT_ID,
+                redirect_uri: `${window.location.origin}/auth/google/callback`,
+                response_type: 'token',
+                scope: 'email profile openid',
+        });
+        window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+  };
   return (
-    <Button type="button" variant="outline" className="w-full" onClick={() => googleLogin()}>
+    <Button type="button" variant="outline" className="w-full" onClick={(handleGoogleRedirect}>
       {googleIconSvg}
       {label}
     </Button>
