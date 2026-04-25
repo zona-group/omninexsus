@@ -274,7 +274,12 @@ if (req.method === 'POST' && url === '/api/auth/google') {
         }
         // Also check media:thumbnail in item XML
         const mediaThumbnailMatch = itemXml.match(/<media:thumbnail[^>]+url=["']([^"']+)["']/i);
-        if (mediaThumbnailMatch) urlToImage = mediaThumbnailMatch[1];
+        if (mediaThumbnailMatch) { urlToImage = mediaThumbnailMatch[1]; }
+        // Track if description contained an article-specific image
+        const hasDescImage = !!(imgTagMatch && imgTagMatch[1] && !imgTagMatch[1].includes('1x1')) || !!mediaThumbnailMatch;
+        // Extract real source article URL from description href (bypasses Google News redirect)
+        const descHrefMatch = rawDesc.match(/<a[^>]+href=["'](https?:\/\/(?!news\.google)[^"']+)["']/i);
+        const realUrl = descHrefMatch ? descHrefMatch[1] : '';
         let description = rawDesc.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
         if (description.length > 300) description = description.substring(0, 297) + '...';
         if (!description || description.length < 10) description = title;
@@ -285,6 +290,8 @@ if (req.method === 'POST' && url === '/api/auth/google') {
           description,
           url: link,
           urlToImage,
+          hasDescImage,
+          realUrl,
                             publishedAt,
                             source: { name: sourceName },
                             author: sourceName,
@@ -296,7 +303,13 @@ if (req.method === 'POST' && url === '/api/auth/google') {
 
                             // Fetch real og:image for each article in parallel
   const imageResults = await Promise.all(
-    items.map(item => fetchOGImage(item.url, pickImage(validCat, item.title)))
+    items.map(item => {
+      // If description already had an article image, use it directly
+      if (item.hasDescImage) return Promise.resolve(item.urlToImage);
+      // Otherwise fetch OG image from real article URL (not Google redirect)
+      const fetchUrl = item.realUrl || item.url;
+      return fetchOGImage(fetchUrl, pickImage(validCat, item.title));
+    })
   );
   items = items.map((item, i) => ({ ...item, urlToImage: imageResults[i] }));
 
