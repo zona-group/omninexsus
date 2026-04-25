@@ -27,76 +27,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
-    if(email==='info@omninexsus.com'&&password==='OmniAdmin2025!'){const adminUser:any={id:'admin_omni',email:'info@omninexsus.com',name:'OmniNexus Admin',avatar:'https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff',createdAt:'2024-01-01T00:00:00.000Z',preferences:{language:'en',notifications:true,theme:'dark'}};setUser(adminUser);localStorage.setItem('omni_user',JSON.stringify(adminUser));return true;} const foundUser = mockUsers.find((u: any) => u.email === email && u.password === password);
-    
-    if (foundUser) {
-      const { password, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
-      localStorage.setItem('omni_user', JSON.stringify(userWithoutPassword));
-      return true;
-    }
-    return false;
+        if(email==='info@omninexsus.com'&&password==='OmniAdmin2025!'){const adminUser:any={id:'admin_omni',email:'info@omninexsus.com',name:'OmniNexus Admin',avatar:'https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff',createdAt:'2024-01-01T00:00:00.000Z',preferences:{language:'en',notifications:true,theme:'dark'}};setUser(adminUser);localStorage.setItem('omni_user',JSON.stringify(adminUser));return true;}
+    try {
+      const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({email, password}) });
+      if (!res.ok) return false;
+      const {user} = await res.json();
+      setUser(user); localStorage.setItem('omni_user', JSON.stringify(user)); return true;
+    } catch { return false; }
   };
 
   const loginWithGoogle = async (userData?: { email: string; name: string; avatar: string }): Promise<boolean> => {
-    const googleUser: User = {
-      id: 'google_' + Date.now(),
-      email: userData?.email || 'user@gmail.com',
-      name: userData?.name || 'Google User',
-      avatar: userData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || 'Google+User')}&background=6366f1&color=fff`,
-      createdAt: new Date().toISOString(),
-      preferences: {
-        language: 'en',
-        notifications: true,
-        theme: 'dark'
-      }
-    };
-    setUser(googleUser);
-    localStorage.setItem('omni_user', JSON.stringify(googleUser));
-    const _allUsers=JSON.parse(localStorage.getItem('omni_users')||'[]'); const _isNew=!_allUsers.some((u:any)=>u.email===(userData?.email||'')); if(_isNew){_allUsers.push({...googleUser,googleAuth:true});localStorage.setItem('omni_users',JSON.stringify(_allUsers));} if (_isNew && userData?.email) {
-      fetch('/api/email/welcome', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: googleUser.name, email: googleUser.email }),
-      }).catch(() => {});
+      try {
+    const res = await fetch('/api/auth/google', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email: userData?.email, name: userData?.name, avatar: userData?.avatar, googleId: '' }) });
+    if (!res.ok) return false;
+    const {user, isNew} = await res.json();
+    setUser(user); localStorage.setItem('omni_user', JSON.stringify(user));
+    if (isNew && userData?.email) {
+      fetch('/api/email/welcome', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: user.name, email: user.email }) }).catch(() => {});
     }
     return true;
-  };
+  } catch { return false; }
+};
 
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
-    const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
-    
-    if (mockUsers.some((u: any) => u.email === email)) {
-      return false;
-    }
-
-    const newUser = {
-      id: 'user_' + Date.now(),
-      email,
-      password,
-      name,
-      createdAt: new Date().toISOString(),
-      preferences: {
-        language: 'en',
-        notifications: true,
-        theme: 'dark'
-      }
-    };
-
-    mockUsers.push(newUser);
-    localStorage.setItem('omni_users', JSON.stringify(mockUsers));
-
-    const { password: _, ...userWithoutPassword } = newUser;
-    setUser(userWithoutPassword as User);
-    localStorage.setItem('omni_user', JSON.stringify(userWithoutPassword));
-    // Send welcome email
-    fetch('/api/email/welcome', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email }),
-    }).catch(() => {});
-    return true;
+  try {
+        const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({email, password, name}) });
+      if (!res.ok) return false;
+      const {user} = await res.json();
+      setUser(user); localStorage.setItem('omni_user', JSON.stringify(user)); return true;
+    } catch { return false; }
   };
 
   const logout = () => {

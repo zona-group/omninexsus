@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const mysql = require('mysql2/promise');
 const port = process.env.PORT || 3000;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const MAIL_FROM = "OmniNexus <onboarding@resend.dev>";
@@ -24,6 +25,11 @@ const NEWS_CACHE_TTL = 5 * 60 * 1000;
 
 const ogImageCache = {};
 const welcomedEmails = new Set();
+
+// MySQL connection pool
+const dbUrl = (process.env.DATABASE_URL || '').replace('mysql+pymysql://', 'mysql://');
+let pool = null;
+if (dbUrl) { try { const u = new URL(dbUrl); pool = mysql.createPool({ host: u.hostname, port: parseInt(u.port) || 3306, user: u.username, password: u.password, database: u.pathname.slice(1), waitForConnections: true, connectionLimit: 10 }); console.log('MySQL pool created'); } catch(e) { console.error('MySQL pool error:', e.message); } }
 const userArticles = [];
 
 async function fetchOGImage(url, fallback, timeoutMs = 4000) {
@@ -151,7 +157,44 @@ http.createServer(async (req, res) => {
                           return;
                     }
 
-                    // Google News RSS proxy endpoint
+                    // Auth routes
+if (req.method === 'POST' && url === '/api/auth/register') {
+  try {
+    const {name,email,password} = JSON.parse(await readBody(req));
+    if (!name||!email||!password) {res.writeHead(400,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'Missing fields'}));return;}
+    if (!pool) {res.writeHead(503,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'DB unavailable'}));return;}
+    const hash = require('crypto').createHash('sha256').update(password).digest('hex');
+    const id = 'u_'+Date.now();
+    const av = 'https://ui-avatars.com/api/?name='+encodeURIComponent(name)+'&background=6366f1&color=fff';
+    try { await pool.execute('INSERT INTO users (id,name,email,password_hash,avatar,created_at) VALUES (?,?,?,?,?,NOW())',[id,name,email,hash,av]); }
+    catch(de) { if(de.code==='ER_DUP_ENTRY'){res.writeHead(409,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'Email already registered'}));return;} throw de; }
+    const [[user]] = await pool.execute('SELECT id,name,email,avatar,created_at FROM users WHERE email=?',[email]);
+    res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({user})); return;
+  } catch(e) {res.writeHead(500,{'Content-Type':'application/json'});res.end(JSON.stringify({error:e.message}));return;}
+}
+if (req.method === 'POST' && url === '/api/auth/login') {
+  try {
+    const {email,password} = JSON.parse(await readBody(req));
+    if (!pool) {res.writeHead(503,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'DB unavailable'}));return;}
+    const hash = require('crypto').createHash('sha256').update(password||'').digest('hex');
+    const [[user]] = await pool.execute('SELECT id,name,email,avatar,created_at FROM users WHERE email=? AND password_hash=?',[email,hash]);
+    if (!user) {res.writeHead(401,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'Invalid email or password'}));return;}
+    res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({user})); return;
+  } catch(e) {res.writeHead(500,{'Content-Type':'application/json'});res.end(JSON.stringify({error:e.message}));return;}
+}
+if (req.method === 'POST' && url === '/api/auth/google') {
+  try {
+    const {email,name,avatar,googleId} = JSON.parse(await readBody(req));
+    if (!pool) {res.writeHead(503,{'Content-Type':'application/json'});res.end(JSON.stringify({error:'DB unavailable'}));return;}
+    const [[existing]] = await pool.execute('SELECT id,name,email,avatar,created_at FROM users WHERE email=?',[email]);
+    if (existing) {res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({user:existing,isNew:false}));return;}
+    const id = 'g_'+(googleId||Date.now());
+    await pool.execute('INSERT INTO users (id,name,email,avatar,created_at) VALUES (?,?,?,?,NOW())',[id,name,email,avatar]);
+    const [[user]] = await pool.execute('SELECT id,name,email,avatar,created_at FROM users WHERE email=?',[email]);
+    res.writeHead(200,{'Content-Type':'application/json'}); res.end(JSON.stringify({user,isNew:true})); return;
+  } catch(e) {res.writeHead(500,{'Content-Type':'application/json'});res.end(JSON.stringify({error:e.message}));return;}
+}
+// Google News RSS proxy endpoint
                     if (req.method === 'GET' && url === '/api/news') {
                           const qs = req.url.includes('?') ? req.url.split('?')[1] : '';
                           const params = new URLSearchParams(qs);
