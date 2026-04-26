@@ -307,7 +307,7 @@ if (req.method === 'POST' && url === '/api/auth/google') {
       // If description already had an article image, use it directly
       // Google RSS thumbnails skipped - use OG image or Unsplash instead
       // Otherwise fetch OG image from real article URL (not Google redirect)
-      return (item.hasDescImage && item.urlToImage && !item.urlToImage.includes('news.google.com')) ? item.urlToImage : (IMAGE_POOLS[validCat]||IMAGE_POOLS.general)[i%(IMAGE_POOLS[validCat]||IMAGE_POOLS.general).length];
+      return (item.hasDescImage && item.urlToImage && !item.urlToImage.includes('news.google.com')) ? item.urlToImage : (()=>{const l=(item.title||'').toLowerCase(),m={technology:['tech','software',' ai ','cyber','hack','digital','startup','apple','google','microsoft','openai'],business:['stock',' market','economy','inflation','tariff','earnings','bank','recession','nasdaq','wall street','federal reserve'],health:['hospital','doctor','vaccine','virus','disease','cancer','fda','surgery','patient','medical','pandemic','covid','treatment','outbreak'],sports:['nfl','nba','mlb','nhl','soccer','football','basketball','baseball','tennis','golf','olympic','championship','tournament','league'],entertainment:['movie','film','actor','actress','singer','music','album','concert','celebrity','netflix','oscar','grammy'],science:['nasa',' space','climate','environment','carbon','solar','asteroid','galaxy','fossil']};for(const[c,ks]of Object.entries(m)){if(ks.some(k=>l.includes(k))){const p=IMAGE_POOLS[c]||IMAGE_POOLS[validCat]||IMAGE_POOLS.general;return p[i%p.length];}}const p=IMAGE_POOLS[validCat]||IMAGE_POOLS.general;return p[i%p.length];})();
       // fetchOGImage removed - using Unsplash pool instead
     })
   );
