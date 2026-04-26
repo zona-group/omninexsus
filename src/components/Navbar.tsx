@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
-  DropdownMenuContent,
+  DropdownMenuContent,h
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -132,11 +132,11 @@ export default function Navbar({ onSearch }: NavbarProps) {
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-full p-0 overflow-hidden">
                     <img
                       src={user?.avatar || `https://ui-avatars.com/api/?name=${user?.name}&background=6366f1&color=fff`}
                       alt={user?.name}
-                      className="h-8 w-8 rounded-full object-cover"
+                      className="h-full w-full rounded-full object-cover"
                     />
                   </Button>
                 </DropdownMenuTrigger>
