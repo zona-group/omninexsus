@@ -307,8 +307,8 @@ if (req.method === 'POST' && url === '/api/auth/google') {
       // If description already had an article image, use it directly
       // Google RSS thumbnails skipped - use OG image or Unsplash instead
       // Otherwise fetch OG image from real article URL (not Google redirect)
-      if (!item.realUrl) return Promise.resolve(pickImage(validCat, item.title)); const fetchUrl = item.realUrl;
-      return fetchOGImage(fetchUrl, pickImage(validCat, item.title));
+      return Promise.resolve(pickImage(validCat, item.title));
+      // fetchOGImage removed - using Unsplash pool instead
     })
   );
   items = items.map((item, i) => ({ ...item, urlToImage: imageResults[i] }));
