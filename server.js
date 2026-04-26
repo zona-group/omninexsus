@@ -307,7 +307,7 @@ if (req.method === 'POST' && url === '/api/auth/google') {
       // If description already had an article image, use it directly
       // Google RSS thumbnails skipped - use OG image or Unsplash instead
       // Otherwise fetch OG image from real article URL (not Google redirect)
-      return (IMAGE_POOLS[validCat]||IMAGE_POOLS.general)[i%(IMAGE_POOLS[validCat]||IMAGE_POOLS.general).length];
+      return (item.hasDescImage && item.urlToImage && !item.urlToImage.includes('news.google.com')) ? item.urlToImage : (IMAGE_POOLS[validCat]||IMAGE_POOLS.general)[i%(IMAGE_POOLS[validCat]||IMAGE_POOLS.general).length];
       // fetchOGImage removed - using Unsplash pool instead
     })
   );
