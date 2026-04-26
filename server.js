@@ -303,11 +303,11 @@ if (req.method === 'POST' && url === '/api/auth/google') {
 
                             // Fetch real og:image for each article in parallel
   const imageResults = await Promise.all(
-    items.map(item => {
+    items.map((item, i) => {
       // If description already had an article image, use it directly
       // Google RSS thumbnails skipped - use OG image or Unsplash instead
       // Otherwise fetch OG image from real article URL (not Google redirect)
-      return Promise.resolve(pickImage(validCat, item.title));
+      return (IMAGE_POOLS[validCat]||IMAGE_POOLS.general)[i%(IMAGE_POOLS[validCat]||IMAGE_POOLS.general).length];
       // fetchOGImage removed - using Unsplash pool instead
     })
   );
