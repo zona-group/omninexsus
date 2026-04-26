@@ -30,11 +30,22 @@ const welcomedEmails = new Set();
 const dbUrl = (process.env.DATABASE_URL || '').replace('mysql+pymysql://', 'mysql://');
 let pool = null;
 if (dbUrl) { try { const u = new URL(dbUrl); pool = mysql.createPool({ host: u.hostname, port: parseInt(u.port) || 3306, user: u.username, password: u.password, database: u.pathname.slice(1), waitForConnections: true, connectionLimit: 10 }); console.log('MySQL pool created');
-  // Ensure required columns exist (safe migration)
-  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `name` VARCHAR(255) NOT NULL DEFAULT ''").catch(()=>{});
-  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `avatar` VARCHAR(500) NOT NULL DEFAULT ''").catch(()=>{});
-  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `created_at` DATETIME DEFAULT NOW()").catch(()=>{});
-  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `password_hash` VARCHAR(255) DEFAULT NULL").catch(()=>{}); } catch(e) { console.error('MySQL pool error:', e.message); } }
+  // Ensure required columns exist (MySQL 5.7 compatible migration)
+  (async () => {
+    const colDefs = [
+      ['name', 'VARCHAR(255) NOT NULL DEFAULT ''''],
+      ['avatar', 'VARCHAR(500) NOT NULL DEFAULT ''''],
+      ['created_at', 'DATETIME DEFAULT NOW()'],
+      ['password_hash', 'VARCHAR(255) DEFAULT NULL']
+    ];
+    for (const [col, def] of colDefs) {
+      try {
+        const [[r]] = await pool.query('SELECT COUNT(*) as c FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=''users'' AND COLUMN_NAME=?', [col]);
+        if (r.c === 0) { await pool.query('ALTER TABLE users ADD COLUMN `' + col + '` ' + def); console.log('Added column:', col); }
+      } catch(e) { console.error('Migration error:', col, e.message); }
+    }
+    console.log('DB migration check complete');
+  })(); } catch(e) { console.error('MySQL pool error:', e.message); } }
 const userArticles = [];
 
 async function fetchOGImage(url, fallback, timeoutMs = 4000) {
