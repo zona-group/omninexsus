@@ -29,7 +29,12 @@ const welcomedEmails = new Set();
 // MySQL connection pool
 const dbUrl = (process.env.DATABASE_URL || '').replace('mysql+pymysql://', 'mysql://');
 let pool = null;
-if (dbUrl) { try { const u = new URL(dbUrl); pool = mysql.createPool({ host: u.hostname, port: parseInt(u.port) || 3306, user: u.username, password: u.password, database: u.pathname.slice(1), waitForConnections: true, connectionLimit: 10 }); console.log('MySQL pool created'); } catch(e) { console.error('MySQL pool error:', e.message); } }
+if (dbUrl) { try { const u = new URL(dbUrl); pool = mysql.createPool({ host: u.hostname, port: parseInt(u.port) || 3306, user: u.username, password: u.password, database: u.pathname.slice(1), waitForConnections: true, connectionLimit: 10 }); console.log('MySQL pool created');
+  // Ensure required columns exist (safe migration)
+  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `name` VARCHAR(255) NOT NULL DEFAULT ''").catch(()=>{});
+  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `avatar` VARCHAR(500) NOT NULL DEFAULT ''").catch(()=>{});
+  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `created_at` DATETIME DEFAULT NOW()").catch(()=>{});
+  pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS `password_hash` VARCHAR(255) DEFAULT NULL").catch(()=>{}); } catch(e) { console.error('MySQL pool error:', e.message); } }
 const userArticles = [];
 
 async function fetchOGImage(url, fallback, timeoutMs = 4000) {
