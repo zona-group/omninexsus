@@ -70,10 +70,10 @@ const IMAGE_POOLS = {
   general: [
     'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800',
     'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800',
-    'https://images.unsplash.com/photo-1557992260-ec58e38d363c?w=800',
-    'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800',
-    'https://images.unsplash.com/photo-1598128558393-70ff21433be0?w=800',
-    'https://images.unsplash.com/photo-1526378800651-c32d170fe6f8?w=800',
+    'https://images.unsplash.com/photo-1503428593586-e225b39bddfe?w=800',
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800',
+    'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800',
+    'https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=800',
   ],
   technology: [
     'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800',
