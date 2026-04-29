@@ -1,47 +1,32 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
-import { NewsProvider } from '@/context/NewsContext';
-import { Sonner } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/sonner';
 
 // Pages
 import Home from '@/pages/Home';
-import ArticleDetail from '@/pages/ArticleDetail';
-import SavedArticles from '@/pages/SavedArticles';
+import Chat from '@/pages/Chat';
+import Pricing from '@/pages/Pricing';
 import Profile from '@/pages/Profile';
-import About from '@/pages/About';
-import Privacy from '@/pages/Privacy';
-import Terms from '@/pages/Terms';
-import Admin from '@/pages/Admin';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
-import SearchResults from '@/pages/SearchResults';
-import EditorPanel from '@/pages/EditorPanel';
-import GoogleCallback from '@/pages/GoogleCallback';
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <NewsProvider>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/article/:id" element={<ArticleDetail />} />
-            <Route path="/saved" element={<SavedArticles />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/search" element={<SearchResults />} />
-                          <Route path="/editor" element={<EditorPanel />} />
-                        <Route path="/auth/google/callback" element={<GoogleCallback />} />
-          </Routes>
-          <Sonner />
-        </NewsProvider>
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          {/* Fallback */}
+          <Route path="*" element={<Home />} />
+        </Routes>
+      </Router>
+      <Toaster position="bottom-right" />
+    </AuthProvider>
   );
 }
 
