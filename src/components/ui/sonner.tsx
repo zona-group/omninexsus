@@ -13,4 +13,4 @@ function Sonner() {
   )
 }
 
-export { Sonner }
+export { Sonner as Toaster }
