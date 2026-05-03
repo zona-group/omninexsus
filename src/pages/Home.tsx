@@ -1,380 +1,242 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useNews } from '@/context/NewsContext';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { 
-  Bookmark, 
-  MessageCircle, 
-  ExternalLink, 
-  Calendar, 
-  Globe, 
-  TrendingUp,
-  Cpu,
-  Briefcase,
-  Trophy,
-  Gamepad2,
-  HardDrive,
-  ChevronDown
-} from 'lucide-react';
-import { toast } from 'sonner';
-import type { Category } from '@/types';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ArrowRight, Zap, Shield, Sparkles } from 'lucide-react';
 
-const categories: { id: Category; name: string; icon: React.ReactNode }[] = [
-  { id: 'general', name: 'Top Stories', icon: <TrendingUp className="w-4 h-4" /> },
-  { id: 'technology', name: 'Technology', icon: <Cpu className="w-4 h-4" /> },
-  { id: 'business', name: 'Business', icon: <Briefcase className="w-4 h-4" /> },
-  { id: 'sports', name: 'Sports', icon: <Trophy className="w-4 h-4" /> },
-  { id: 'gaming', name: 'Gaming', icon: <Gamepad2 className="w-4 h-4" /> },
-  { id: 'hardware', name: 'PC Hardware', icon: <HardDrive className="w-4 h-4" /> },
-];
-
-const breakingNews = [
-  'Markets reach all-time high amid AI boom',
-  'New climate accord signed by 120 nations',
-  'SpaceX Starship completes lunar mission',
-  'WHO announces breakthrough cancer treatment',
-  'Tech giants unveil next-gen AI assistants',
-  'Global GDP growth surpasses 4% forecast',
+const MODES = [
+  {
+    icon: '\u{1F468}\u200D\u{1F4BB}',
+    label: 'Developer',
+    color: 'from-blue-500/20 to-indigo-500/20',
+    border: 'border-blue-500/30',
+    badge: 'bg-blue-500/20 text-blue-400',
+    description: 'Write, debug, and explain code. Get architecture advice and technical documentation in seconds.',
+    examples: ['Fix this React hook bug', 'Write a REST API in Go', 'Explain async/await'],
+  },
+  {
+    icon: '\u{1F52C}',
+    label: 'Researcher',
+    color: 'from-green-500/20 to-teal-500/20',
+    border: 'border-green-500/30',
+    badge: 'bg-green-500/20 text-green-400',
+    description: 'Search and analyze information. Summarize papers, compare perspectives, and build structured reports.',
+    examples: ['Summarize this paper', 'Compare X vs Y', 'Research trends in AI'],
+  },
+  {
+    icon: '\u{1F3A8}',
+    label: 'Designer',
+    color: 'from-pink-500/20 to-purple-500/20',
+    border: 'border-pink-500/30',
+    badge: 'bg-pink-500/20 text-pink-400',
+    description: 'Generate UI/UX concepts, color palettes, typography choices, copy, and full design briefs.',
+    examples: ['Color palette for fintech app', 'Landing page copy', 'Font pairing for a startup'],
+  },
 ];
 
 export default function Home() {
-  const { articles, loading, currentCategory, setCategory, saveArticle, unsaveArticle, isArticleSaved } = useNews();
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const [displayedArticles, setDisplayedArticles] = useState(6);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
-  useEffect(() => {
-    setCategory('general');
-  }, []);
-
-  const handleSave = (article: any) => {
-    if (!isAuthenticated) {
-      toast.error('Please login to save articles');
-      return;
-    }
-    if (isArticleSaved(article.id)) {
-      unsaveArticle(article.id);
-      toast.success('Article removed from saved');
-    } else {
-      saveArticle(article);
-      toast.success('Article saved');
-    }
+  const handleCTA = () => {
+    if (isAuthenticated) { navigate('/chat'); } else { setShowRegister(true); }
   };
-
-  const loadMore = () => {
-    setDisplayedArticles(prev => prev + 6);
-  };
-
-  const filteredArticles = currentCategory === 'general' 
-    ? articles 
-    : articles.filter(a => a.category === currentCategory);
-
-  const heroArticle = filteredArticles[0];
-  const gridArticles = filteredArticles.slice(1, displayedArticles);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
 
-      {/* Breaking News Ticker */}
-      <div className="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border-b border-border/50 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-          <div className="flex items-center gap-4">
-            <Badge className="bg-red-500/20 text-red-400 border-red-500/30 shrink-0">
-              ⚡ BREAKING
-            </Badge>
-            <div className="overflow-hidden flex-1">
-              <div className="flex gap-8 ticker-content whitespace-nowrap">
-                {[...breakingNews, ...breakingNews].map((news, i) => (
-                  <span key={i} className="text-sm text-muted-foreground flex items-center gap-2">
-                    {news}
-                    <span className="text-primary">◆</span>
-                  </span>
-                ))}
-              </div>
-            </div>
+      {/* Hero */}
+      <section className="relative flex-1 flex flex-col items-center justify-center text-center px-4 py-24 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 text-sm text-primary mb-8">
+            <Sparkles className="w-3.5 h-3.5" /> Powered by Claude · Built for professionals
           </div>
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+            One AI platform.<br />
+            <span className="gradient-text">Three expert modes.</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10">
+            Whether you are coding, researching, or designing — OmniNexus puts the right AI expert at your fingertips.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8 h-12" onClick={handleCTA}>
+              Start for free <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 h-12 border-border/70" onClick={() => navigate('/pricing')}>
+              View pricing
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground mt-4">5 free messages · No credit card required</p>
         </div>
-      </div>
+      </section>
 
-      {/* Category Navigation */}
-      <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-sm border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setCategory(cat.id)}
-                className={`cat-btn flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all border ${
-                  currentCategory === cat.id
-                    ? 'active border-transparent'
-                    : 'bg-secondary/50 text-muted-foreground border-border/50 hover:border-primary/50 hover:text-primary'
-                }`}
+      {/* Modes */}
+      <section className="py-20 px-4 bg-card/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Choose your mode</h2>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Each mode has a specialized AI persona tuned for that discipline.</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {MODES.map(m => (
+              <div
+                key={m.label}
+                className={`rounded-2xl border ${m.border} bg-gradient-to-br ${m.color} p-6 flex flex-col gap-4 hover:scale-[1.02] transition-transform cursor-pointer`}
+                onClick={handleCTA}
               >
-                {cat.icon}
-                {cat.name}
-              </button>
+                <div className="flex items-center gap-3">
+                  <span className="text-4xl">{m.icon}</span>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${m.badge}`}>{m.label}</span>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">{m.description}</p>
+                <div className="mt-auto space-y-1.5">
+                  {m.examples.map(ex => (
+                    <div key={ex} className="flex items-center gap-2 text-xs text-muted-foreground/70 bg-background/40 rounded-lg px-3 py-1.5">
+                      <span className="text-primary">→</span>{ex}
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Section Title */}
-        <h1 className="text-2xl font-bold mb-6">
-          {categories.find(c => c.id === currentCategory)?.name || 'Latest Headlines'}
-        </h1>
+      {/* Features */}
+      <section className="py-16 px-4">
+        <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8 text-center">
+          {[
+            { icon: <Zap className="w-6 h-6" />, title: 'Fast responses', desc: 'Claude-powered answers in seconds.' },
+            { icon: <Shield className="w-6 h-6" />, title: 'Private by default', desc: 'Your conversations are never used for training.' },
+            { icon: <Sparkles className="w-6 h-6" />, title: '3 specialized modes', desc: 'Developer, Researcher, Designer — each finely tuned.' },
+          ].map(({ icon, title, desc }) => (
+            <div key={title} className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">{icon}</div>
+              <h3 className="font-semibold">{title}</h3>
+              <p className="text-sm text-muted-foreground">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        {loading ? (
-          <div className="space-y-6">
-            <Skeleton className="h-[400px] w-full rounded-2xl" />
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map(i => (
-                <Skeleton key={i} className="h-[300px] rounded-xl" />
-              ))}
+      {/* Pricing preview */}
+      <section className="py-20 px-4 bg-card/30">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Simple, honest pricing</h2>
+          <p className="text-muted-foreground mb-8">Start free. Upgrade when you need more.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="rounded-2xl border border-border/50 bg-card px-8 py-6 min-w-48">
+              <div className="text-3xl font-bold">$0</div>
+              <div className="text-muted-foreground text-sm mt-1">5 free messages</div>
+            </div>
+            <div className="text-muted-foreground">to</div>
+            <div className="rounded-2xl border-2 border-primary/40 bg-card px-8 py-6 min-w-48 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs px-3 py-0.5 rounded-full font-semibold">PRO</div>
+              <div className="text-3xl font-bold gradient-text">$15</div>
+              <div className="text-muted-foreground text-sm mt-1">per month · unlimited</div>
             </div>
           </div>
-        ) : (
-          <>
-            {/* Hero Article */}
-            {heroArticle && (
-              <div className="mb-8">
-                <Link to={`/article/${heroArticle.id}`}>
-                  <div className="hero-card group relative h-[400px] md:h-[500px] bg-gradient-to-br from-slate-800 to-slate-900">
-                    <img
-                      src={heroArticle.urlToImage || 'https://images.unsplash.com/photo-1611974765270-ca1258634369?w=1200&q=80'}
-                      alt={heroArticle.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="eager"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80';
-                      }}
-                    />
-                    <div className="hero-overlay" />
-                    <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Badge className="bg-primary/20 text-primary border-primary/30">
-                          {heroArticle.source?.name}
-                        </Badge>
-                        <Badge className="bg-red-500/20 text-red-400 border-red-500/30">
-                          Breaking
-                        </Badge>
-                      </div>
-                      <h2 className="text-2xl md:text-4xl font-bold text-white mb-3 line-clamp-2">
-                        {heroArticle.title}
-                      </h2>
-                      {heroArticle.description && (
-                        <p className="text-gray-300 text-sm md:text-base mb-4 line-clamp-2 max-w-2xl">
-                          {heroArticle.description}
-                        </p>
-                      )}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {new Date(heroArticle.publishedAt).toLocaleDateString('en-US', {
-                              weekday: 'long',
-                              month: 'long',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })}
-                          </span>
-                        </div>
-                        <div className="flex gap-2" onClick={(e) => e.preventDefault()}>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            className={isArticleSaved(heroArticle.id) ? 'text-primary' : ''}
-                            onClick={() => handleSave(heroArticle)}
-                          >
-                            <Bookmark className="w-4 h-4 mr-1" />
-                            {isArticleSaved(heroArticle.id) ? 'Saved' : 'Save'}
-                          </Button>
-                          <Button variant="secondary" size="sm">
-                            <MessageCircle className="w-4 h-4 mr-1" />
-                            Discuss
-                          </Button>
-                          <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600">
-                            Read
-                            <ExternalLink className="w-4 h-4 ml-1" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            )}
+          <Button className="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600" onClick={() => navigate('/pricing')}>
+            See full pricing details
+          </Button>
+        </div>
+      </section>
 
-            {/* Articles Grid */}
-            {gridArticles.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gridArticles.map((article, index) => (
-                  <article
-                    key={article.id}
-                    className="news-card"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <Link to={`/article/${article.id}`}>
-                      <div className="relative h-48 overflow-hidden">
-                        <img
-                          src={article.urlToImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800'}
-                          alt={article.title}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                        <div className="absolute bottom-3 left-3">
-                          <Badge variant="secondary" className="text-xs">
-                            {article.source?.name}
-                          </Badge>
-                        </div>
-                      </div>
-                    </Link>
-                    <div className="p-4">
-                      <Link to={`/article/${article.id}`}>
-                        <h3 className="font-semibold text-lg mb-2 line-clamp-2 hover:text-primary transition-colors">
-                          {article.title}
-                        </h3>
-                      </Link>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                        {article.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(article.publishedAt).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </span>
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => handleSave(article)}
-                            className={`p-2 rounded-lg hover:bg-secondary transition-colors ${
-                              isArticleSaved(article.id) ? 'text-primary' : 'text-muted-foreground'
-                            }`}
-                          >
-                            <Bookmark className="w-4 h-4" />
-                          </button>
-                          <Link
-                            to={`/article/${article.id}#comments`}
-                            className="p-2 rounded-lg hover:bg-secondary transition-colors text-muted-foreground"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                          </Link>
-                          <a
-                            href={article.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-lg hover:bg-secondary transition-colors text-muted-foreground"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <div className="empty-state">
-                <div className="empty-state-icon">🔍</div>
-                <div className="empty-state-title text-xl font-semibold mb-2">
-                  No articles found
-                </div>
-                <div className="text-muted-foreground">
-                  Try a different category or check back later.
-                </div>
-              </div>
-            )}
+      <footer className="py-8 px-4 border-t border-border/50 text-center text-sm text-muted-foreground">
+        <p>2024 OmniNexus · Built with Claude by Anthropic</p>
+      </footer>
 
-            {/* Load More */}
-            {displayedArticles < filteredArticles.length && (
-              <div className="text-center mt-8">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={loadMore}
-                  className="gap-2"
-                >
-                  Load more stories
-                  <ChevronDown className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
-          </>
-        )}
+      {/* Login Modal */}
+      <Dialog open={showLogin} onOpenChange={setShowLogin}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle className="text-center gradient-text">Welcome Back</DialogTitle></DialogHeader>
+          <LoginForm onClose={() => setShowLogin(false)} onRegisterClick={() => { setShowLogin(false); setShowRegister(true); }} />
+        </DialogContent>
+      </Dialog>
 
-        {/* Contact Section */}
-        <section id="contact" className="mt-20 scroll-mt-20">
-          <div className="bg-gradient-to-br from-secondary/50 to-background rounded-2xl p-8 md:p-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div>
-                <h2 className="text-3xl font-bold gradient-text mb-4">Contact Us</h2>
-                <p className="text-muted-foreground mb-8">
-                  Questions, suggestions, or partnership proposals? Leave us a message and our team will get back to you shortly.
-                </p>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="text-lg">📧</span>
-                    </div>
-                    <div>
-                      <div className="text-sm text-foreground">Email</div>
-                      <div>info@omninexsus.com</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <div className="text-sm text-foreground">Website</div>
-                      <div>www.omninexsus.com</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <span className="text-lg">⏱</span>
-                    </div>
-                    <div>
-                      <div className="text-sm text-foreground">Response Time</div>
-                      <div>Within 24 hours</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <form className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  className="form-input w-full"
-                />
-                <input
-                  type="email"
-                  placeholder="Your Email"
-                  className="form-input w-full"
-                />
-                <textarea
-                  placeholder="Your Message"
-                  rows={5}
-                  className="form-input w-full resize-none"
-                />
-                <Button type="submit" className="w-full bg-gradient-to-r from-indigo-500 to-purple-600">
-                  Send Message
-                </Button>
-              </form>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <Footer />
+      {/* Register Modal */}
+      <Dialog open={showRegister} onOpenChange={setShowRegister}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle className="text-center gradient-text">Create Account</DialogTitle></DialogHeader>
+          <RegisterForm onClose={() => setShowRegister(false)} onLoginClick={() => { setShowRegister(false); setShowLogin(true); }} />
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegisterClick: () => void }) {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    const ok = await login(email, password);
+    if (ok) { onClose(); navigate('/chat'); } else { setError('Invalid email or password'); }
+    setLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <p className="text-sm text-red-500">{error}</p>}
+      <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+      <Input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+      <Button type="submit" className="w-full bg-gradient-to-r from-indigo-500 to-purple-600" disabled={loading}>
+        {loading ? 'Logging in...' : 'Login'}
+      </Button>
+      <p className="text-center text-sm text-muted-foreground">
+        No account?{' '}
+        <button type="button" onClick={onRegisterClick} className="text-primary hover:underline">Sign up free</button>
+      </p>
+    </form>
+  );
+}
+
+function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginClick: () => void }) {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    const ok = await register(email, password, name);
+    if (ok) { onClose(); navigate('/chat'); } else { setError('Email already exists'); }
+    setLoading(false);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <p className="text-sm text-red-500">{error}</p>}
+      <Input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} required />
+      <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+      <Input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+      <Button type="submit" className="w-full bg-gradient-to-r from-indigo-500 to-purple-600" disabled={loading}>
+        {loading ? 'Creating account...' : 'Create Account'}
+      </Button>
+      <p className="text-center text-sm text-muted-foreground">
+        Have an account?{' '}
+        <button type="button" onClick={onLoginClick} className="text-primary hover:underline">Login</button>
+      </p>
+    </form>
   );
 }
