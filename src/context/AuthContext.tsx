@@ -5,7 +5,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  loginWithGoogle: () => Promise<boolean>;
+  loginWithGoogle: (data?: { email: string; name: string; avatar?: string }) => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<boolean>;
@@ -38,53 +38,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  const loginWithGoogle = async (): Promise<boolean> => {
-    // Load Google Identity Services script
-    const loadGSI = (): Promise<void> => new Promise((resolve) => {
-      if ((window as any).google?.accounts) { resolve(); return; }
-      const s = document.createElement('script');
-      s.src = 'https://accounts.google.com/gsi/client';
-      s.onload = () => resolve();
-      document.body.appendChild(s);
-    });
-
-    // Reuse existing Google session
-    const existing = localStorage.getItem('omni_google_user');
-    if (existing) {
-      const existingUser = JSON.parse(existing);
-      setUser(existingUser);
-      localStorage.setItem('omni_user', existing);
+  const loginWithGoogle = async (googleUserData?: { email: string; name: string; avatar?: string }): Promise<boolean> => {
+    // If called from GoogleCallback with real Google user data
+    if (googleUserData) {
+      const googleUser: User = {
+        id: `google_${Date.now()}`,
+        email: googleUserData.email,
+        name: googleUserData.name || googleUserData.email.split('@')[0],
+        avatar: googleUserData.avatar,
+        createdAt: new Date().toISOString(),
+        preferences: { mode: 'developer', theme: 'dark', language: 'en', notifications: true },
+      };
+      setUser(googleUser);
+      localStorage.setItem('omni_user', JSON.stringify(googleUser));
+      localStorage.setItem('omni_google_user', JSON.stringify(googleUser));
       return true;
     }
 
-    try {
-      await loadGSI();
-      return new Promise((resolve) => {
-        (window as any).google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-          callback: (response: any) => {
-            const parts = response.credential.split('.');
-            const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-            const googleUser: User = {
-              id: `google_${payload.sub}`,
-              email: payload.email,
-              name: payload.name || payload.email.split('@')[0],
-              avatar: payload.picture,
-              createdAt: new Date().toISOString(),
-              preferences: { mode: 'developer', theme: 'dark', language: 'en', notifications: true },
-            };
-            setUser(googleUser);
-            localStorage.setItem('omni_user', JSON.stringify(googleUser));
-            localStorage.setItem('omni_google_user', JSON.stringify(googleUser));
-            resolve(true);
-          },
-          cancel_on_tap_outside: false,
-        });
-        (window as any).google.accounts.id.prompt();
-      });
-    } catch {
-      return false;
+    // Clear old mock data
+    const existing = localStorage.getItem('omni_google_user');
+    if (existing) {
+      const existingUser = JSON.parse(existing);
+      if (existingUser.name !== 'Google User' && existingUser.email !== 'google_user@gmail.com') {
+        setUser(existingUser);
+        localStorage.setItem('omni_user', existing);
+        return true;
+      }
+      localStorage.removeItem('omni_google_user');
+      localStorage.removeItem('omni_user');
     }
+
+    // Redirect to Google OAuth
+    window.location.href = '/api/auth/google';
+    return true;
   };
 
     const register = async (email: string, password: string, name: string): Promise<boolean> => {
