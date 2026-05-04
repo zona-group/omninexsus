@@ -166,20 +166,16 @@ export default function Chat() {
       <Navbar />
       <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-2 flex-wrap">
-          {(Object.entries(MODE_CONFIG) as [Mode, typeof MODE_CONFIG[Mode]][]).map(([key, cfg]) => (
-            <button
-              key={key}
-              onClick={() => handleModeChange(key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
-                mode === key
-                  ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20'
-                  : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border hover:bg-secondary/50'
-              }`}
-            >
-              <span>{cfg.icon}</span>
-              <span>{cfg.label}</span>
-            </button>
-          ))}
+          <div className="flex items-center gap-2">
+            {user?.avatar ? (
+              <img src={user.avatar} alt={user.name || 'User'} className="w-8 h-8 rounded-full object-cover ring-2 ring-primary/30" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold ring-2 ring-primary/30">
+                {(user?.name || 'U').charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="text-sm font-medium text-foreground">{user?.name || 'User'}</span>
+          </div>
           <div className="ml-auto flex items-center gap-3">
             {!subscribed && (
               <div className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border ${
