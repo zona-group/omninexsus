@@ -42,6 +42,48 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+app.get('/api/auth/google', (_req, res) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const redirectUri = process.env.APP_URL
+    ? `${process.env.APP_URL}/api/auth/google/callback`
+    : 'https://www.omninexsus.com/api/auth/google/callback';
+  const scope = 'openid email profile';
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline`;
+  res.redirect(url);
+});
+
+app.get('/api/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const redirectUri = process.env.APP_URL
+    ? `${process.env.APP_URL}/api/auth/google/callback`
+    : 'https://www.omninexsus.com/api/auth/google/callback';
+  try {
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, client_id: clientId, client_secret: clientSecret, redirect_uri: redirectUri, grant_type: 'authorization_code' }),
+    });
+    const tokens = await tokenRes.json();
+    const idToken = tokens.id_token;
+    const payload = JSON.parse(Buffer.from(idToken.split('.')[1], 'base64url').toString());
+    const user = {
+      id: `google_${payload.sub}`,
+      email: payload.email,
+      name: payload.name || payload.email.split('@')[0],
+      avatar: payload.picture || '',
+      createdAt: new Date().toISOString(),
+      preferences: { mode: 'developer', theme: 'dark', language: 'en', notifications: true },
+    };
+    const userData = Buffer.from(JSON.stringify(user)).toString('base64url');
+    res.redirect(`/auth/callback?user=${userData}`);
+  } catch (err) {
+    console.error('Google OAuth error:', err.message);
+    res.redirect('/login?error=google_failed');
+  }
+});
+
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
 const distPath = path.join(__dirname, 'dist');
