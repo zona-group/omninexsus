@@ -63,84 +63,53 @@ export default function Home() {
         onRegisterClick={() => setShowRegisterModal(true)}
       />
 
-      {/* Hero */}
       <section className="relative flex-1 flex flex-col items-center justify-center text-center px-4 py-24 overflow-hidden">
-        {/* Glow blobs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
-
         <div className="relative z-10 max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 text-sm text-primary mb-8">
             <Sparkles className="w-3.5 h-3.5" />
             Powered by Claude · Built for professionals
           </div>
-
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
             One AI platform.{' '}
             <br />
             <span className="gradient-text">Three expert modes.</span>
           </h1>
-
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-10">
             Whether you're coding, researching, or designing — OmniNexus puts the right AI expert at your fingertips.
           </p>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-base px-8 h-12 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
-              onClick={handleCTA}
-            >
+            <Button size="lg" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-base px-8 h-12 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow" onClick={handleCTA}>
               Start for free
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-base px-8 h-12 border-border/70"
-              onClick={() => navigate('/pricing')}
-            >
+            <Button size="lg" variant="outline" className="text-base px-8 h-12 border-border/70" onClick={() => navigate('/pricing')}>
               View pricing
             </Button>
           </div>
-
-          <p className="text-sm text-muted-foreground mt-4">
-            5 free messages · No credit card required
-          </p>
+          <p className="text-sm text-muted-foreground mt-4">5 free messages · No credit card required</p>
         </div>
       </section>
 
-      {/* Mode Cards */}
       <section className="py-20 px-4 bg-card/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Choose your mode</h2>
-            <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-              Each mode has a specialized AI persona tuned for that discipline.
-            </p>
+            <p className="text-muted-foreground text-lg max-w-xl mx-auto">Each mode has a specialized AI persona tuned for that discipline.</p>
           </div>
-
           <div className="grid md:grid-cols-3 gap-6">
             {MODES.map((m) => (
-              <div
-                key={m.label}
-                className={`rounded-2xl border ${m.border} bg-gradient-to-br ${m.color} p-6 flex flex-col gap-4 hover:scale-[1.02] transition-transform cursor-pointer group`}
-                onClick={handleCTA}
-              >
+              <div key={m.label} className={`rounded-2xl border ${m.border} bg-gradient-to-br ${m.color} p-6 flex flex-col gap-4 hover:scale-[1.02] transition-transform cursor-pointer group`} onClick={handleCTA}>
                 <div className="flex items-center gap-3">
                   <span className="text-4xl">{m.icon}</span>
-                  <div>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${m.badge}`}>
-                      {m.label}
-                    </span>
-                  </div>
+                  <div><span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${m.badge}`}>{m.label}</span></div>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">{m.description}</p>
                 <div className="mt-auto space-y-1.5">
                   {m.examples.map((ex) => (
                     <div key={ex} className="flex items-center gap-2 text-xs text-muted-foreground/70 bg-background/40 rounded-lg px-3 py-1.5">
-                      <span className="text-primary">→</span>
-                      {ex}
+                      <span className="text-primary">→</span>{ex}
                     </div>
                   ))}
                 </div>
@@ -150,7 +119,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Strip */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8 text-center">
           {[
@@ -159,9 +127,7 @@ export default function Home() {
             { icon: <Sparkles className="w-6 h-6" />, title: '3 specialized modes', desc: 'Developer, Researcher, Designer — each finely tuned.' },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                {icon}
-              </div>
+              <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">{icon}</div>
               <h3 className="font-semibold">{title}</h3>
               <p className="text-sm text-muted-foreground">{desc}</p>
             </div>
@@ -169,7 +135,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Pricing Teaser */}
       <section className="py-20 px-4 bg-card/30">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Simple, honest pricing</h2>
@@ -186,49 +151,30 @@ export default function Home() {
               <div className="text-muted-foreground text-sm mt-1">per month · unlimited</div>
             </div>
           </div>
-          <Button
-            className="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600"
-            onClick={() => navigate('/pricing')}
-          >
-            See full pricing details
-          </Button>
+          <Button className="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600" onClick={() => navigate('/pricing')}>See full pricing details</Button>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="py-8 px-4 border-t border-border/50 text-center text-sm text-muted-foreground">
-        <p>© 2024 OmniNexus · Built with Claude by Anthropic</p>
+        <p>© 2025 OmniNexus · Anthropic tarafından üretildi</p>
       </footer>
 
-      {/* Auth Modals */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center gradient-text">Welcome Back</DialogTitle>
-          </DialogHeader>
-          <LoginForm
-            onClose={() => setShowLoginModal(false)}
-            onRegisterClick={() => { setShowLoginModal(false); setShowRegisterModal(true); }}
-          />
+          <DialogHeader><DialogTitle className="text-center gradient-text">Welcome Back</DialogTitle></DialogHeader>
+          <LoginForm onClose={() => setShowLoginModal(false)} onRegisterClick={() => { setShowLoginModal(false); setShowRegisterModal(true); }} />
         </DialogContent>
       </Dialog>
 
       <Dialog open={showRegisterModal} onOpenChange={setShowRegisterModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center gradient-text">Create Account</DialogTitle>
-          </DialogHeader>
-          <RegisterForm
-            onClose={() => setShowRegisterModal(false)}
-            onLoginClick={() => { setShowRegisterModal(false); setShowLoginModal(true); }}
-          />
+          <DialogHeader><DialogTitle className="text-center gradient-text">Create Account</DialogTitle></DialogHeader>
+          <RegisterForm onClose={() => setShowRegisterModal(false)} onLoginClick={() => { setShowRegisterModal(false); setShowLoginModal(true); }} />
         </DialogContent>
       </Dialog>
     </div>
   );
 }
-
-// ---- Auth form components ----
 
 function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegisterClick: () => void }) {
   const { login, loginWithGoogle } = useAuth();
@@ -292,9 +238,7 @@ function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginC
       {error === 'email_exists' ? (
         <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 text-center">
           <p className="text-sm text-amber-600 dark:text-amber-400">This email is already registered.</p>
-          <button type="button" onClick={onLoginClick} className="text-sm text-primary hover:underline font-medium mt-1">
-            Login with this email instead →
-          </button>
+          <button type="button" onClick={onLoginClick} className="text-sm text-primary hover:underline font-medium mt-1">Login with this email instead →</button>
         </div>
       ) : error ? (
         <p className="text-sm text-red-500 text-center">{error}</p>
@@ -332,4 +276,4 @@ function Divider() {
       </div>
     </div>
   );
-        }
+          }
