@@ -5,7 +5,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  loginWithGoogle: (userData?: { email: string; name: string; avatar: string }) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   register: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<boolean>;
@@ -27,35 +27,68 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-        if(email==='info@omninexsus.com'&&password==='OmniAdmin2025!'){const adminUser:any={id:'admin_omni',email:'info@omninexsus.com',name:'OmniNexus Admin',avatar:'https://ui-avatars.com/api/?name=Admin&background=6366f1&color=fff',createdAt:'2024-01-01T00:00:00.000Z',preferences:{language:'en',notifications:true,theme:'dark'}};setUser(adminUser);localStorage.setItem('omni_user',JSON.stringify(adminUser));return true;}
-    try {
-      const res = await fetch('/api/auth/login', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({email, password}) });
-      if (!res.ok) return false;
-      const {user} = await res.json();
-      setUser(user); localStorage.setItem('omni_user', JSON.stringify(user)); return true;
-    } catch { return false; }
+    const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
+    const foundUser = mockUsers.find((u: any) => u.email === email && u.password === password);
+    if (foundUser) {
+      const { password, ...userWithoutPassword } = foundUser;
+      setUser(userWithoutPassword);
+      localStorage.setItem('omni_user', JSON.stringify(userWithoutPassword));
+      return true;
+    }
+    return false;
   };
 
-  const loginWithGoogle = async (userData?: { email: string; name: string; avatar: string }): Promise<boolean> => {
-      try {
-    const res = await fetch('/api/auth/google', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email: userData?.email, name: userData?.name, avatar: userData?.avatar, googleId: '' }) });
-    if (!res.ok) return false;
-    const {user, isNew} = await res.json();
-    setUser(user); localStorage.setItem('omni_user', JSON.stringify(user));
-    if (isNew && userData?.email) {
-      fetch('/api/email/welcome', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ name: user.name, email: user.email }) }).catch(() => {});
+  const loginWithGoogle = async (): Promise<boolean> => {
+    // Reuse existing Google session if available
+    const existing = localStorage.getItem('omni_google_user');
+    if (existing) {
+      const existingUser = JSON.parse(existing);
+      setUser(existingUser);
+      localStorage.setItem('omni_user', existing);
+      return true;
     }
+    const googleId = 'google_' + Date.now();
+    const mockUser: User = {
+      id: googleId,
+      email: 'google_user@gmail.com',
+      name: 'Google User',
+      avatar: 'https://ui-avatars.com/api/?name=Google+User&background=6366f1&color=fff',
+      createdAt: new Date().toISOString(),
+      preferences: {
+        language: 'en',
+        notifications: true,
+        theme: 'dark'
+      }
+    };
+    setUser(mockUser);
+    localStorage.setItem('omni_user', JSON.stringify(mockUser));
+    localStorage.setItem('omni_google_user', JSON.stringify(mockUser));
     return true;
-  } catch { return false; }
-};
+  };
 
   const register = async (email: string, password: string, name: string): Promise<boolean> => {
-  try {
-        const res = await fetch('/api/auth/register', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({email, password, name}) });
-      if (!res.ok) return false;
-      const {user} = await res.json();
-      setUser(user); localStorage.setItem('omni_user', JSON.stringify(user)); return true;
-    } catch { return false; }
+    const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
+    if (mockUsers.some((u: any) => u.email === email)) {
+      return false;
+    }
+    const newUser = {
+      id: 'user_' + Date.now(),
+      email,
+      password,
+      name,
+      createdAt: new Date().toISOString(),
+      preferences: {
+        language: 'en',
+        notifications: true,
+        theme: 'dark'
+      }
+    };
+    mockUsers.push(newUser);
+    localStorage.setItem('omni_users', JSON.stringify(mockUsers));
+    const { password: _, ...userWithoutPassword } = newUser;
+    setUser(userWithoutPassword as User);
+    localStorage.setItem('omni_user', JSON.stringify(userWithoutPassword));
+    return true;
   };
 
   const logout = () => {
@@ -64,27 +97,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const forgotPassword = async (email: string): Promise<boolean> => {
-    // Always allow reset - don't gate on localStorage (MySQL users won't be there)
-    const resetToken = 'reset_' + Date.now();
-    localStorage.setItem('omni_reset_token', JSON.stringify({ email, token: resetToken }));
     const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
     const foundUser = mockUsers.find((u: any) => u.email === email);
-    const userName = foundUser?.name || email.split('@')[0];
-    fetch('/api/email/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, token: resetToken, name: userName }),
-    }).catch(() => {});
-    return true;
+    if (foundUser) {
+      const resetToken = 'reset_' + Date.now();
+      localStorage.setItem('omni_reset_token', JSON.stringify({ email, token: resetToken }));
+      return true;
+    }
+    return false;
   };
 
   const resetPassword = async (token: string, newPassword: string): Promise<boolean> => {
     const resetData = JSON.parse(localStorage.getItem('omni_reset_token') || '{}');
-    
     if (resetData.token === token) {
       const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
       const userIndex = mockUsers.findIndex((u: any) => u.email === resetData.email);
-      
       if (userIndex !== -1) {
         mockUsers[userIndex].password = newPassword;
         localStorage.setItem('omni_users', JSON.stringify(mockUsers));
@@ -100,7 +127,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const updatedUser = { ...user, ...data };
       setUser(updatedUser);
       localStorage.setItem('omni_user', JSON.stringify(updatedUser));
-      
       const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
       const userIndex = mockUsers.findIndex((u: any) => u.id === user.id);
       if (userIndex !== -1) {
@@ -116,7 +142,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       const mockUsers = JSON.parse(localStorage.getItem('omni_users') || '[]');
       const userIndex = mockUsers.findIndex((u: any) => u.id === user.id && u.password === currentPassword);
-      
       if (userIndex !== -1) {
         mockUsers[userIndex].password = newPassword;
         localStorage.setItem('omni_users', JSON.stringify(mockUsers));
