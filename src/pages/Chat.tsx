@@ -22,7 +22,44 @@ import {
   isSubscriptionActive,
   FREE_MESSAGE_LIMIT,
 } from '@/lib/claude';
-import { Send, AlertCircle, Zap, Loader2 } from 'lucide-react';
+import { Send, AlertCircle, Zap, Loader2, Play, EyeOff } from 'lucide-react';
+
+function CodeBlock({ lang, code }: { lang: string; code: string }) {
+  const [preview, setPreview] = useState(false);
+  const canPreview = ['html', 'javascript', 'js', 'jsx', 'tsx'].includes(lang.toLowerCase());
+  const iframeContent = lang.toLowerCase() === 'html'
+    ? code
+    : `<!DOCTYPE html><html><head><meta charset="utf-8"/><style>body{font-family:sans-serif;padding:16px;}</style></head><body><script>${code}</script></body></html>`;
+
+  return (
+    <div className="my-3 rounded-lg overflow-hidden border border-border/50">
+      <div className="px-3 py-1.5 bg-secondary/80 text-xs text-muted-foreground font-mono border-b border-border/50 flex items-center justify-between">
+        <span>{lang || 'code'}</span>
+        {canPreview && (
+          <button
+            onClick={() => setPreview(p => !p)}
+            className="flex items-center gap-1 text-primary text-xs px-2 py-0.5 rounded border border-primary/30 hover:bg-primary/10 transition-colors font-sans"
+          >
+            {preview ? <><EyeOff className="w-3 h-3" /> Hide</> : <><Play className="w-3 h-3" /> Run</>}
+          </button>
+        )}
+      </div>
+      {preview && (
+        <div className="border-b border-border/50 bg-white">
+          <iframe
+            srcDoc={iframeContent}
+            className="w-full min-h-64 border-0"
+            sandbox="allow-scripts"
+            title="code-preview"
+          />
+        </div>
+      )}
+      <pre className="p-4 bg-secondary/40 overflow-x-auto text-sm font-mono text-foreground/90 whitespace-pre">
+        {code}
+      </pre>
+    </div>
+  );
+}
 
 function MarkdownText({ text }: { text: string }) {
   const lines = text.split('\n');
@@ -38,18 +75,7 @@ function MarkdownText({ text }: { text: string }) {
         i++;
       }
       i++;
-      elements.push(
-        <div key={i} className="my-3 rounded-lg overflow-hidden border border-border/50">
-          {lang && (
-            <div className="px-3 py-1 bg-secondary/80 text-xs text-muted-foreground font-mono border-b border-border/50">
-              {lang}
-            </div>
-          )}
-          <pre className="p-4 bg-secondary/40 overflow-x-auto text-sm font-mono text-foreground/90 whitespace-pre">
-            {codeLines.join('\n')}
-          </pre>
-        </div>
-      );
+      elements.push(<CodeBlock key={i} lang={lang} code={codeLines.join('\n')} />);
     } else {
       const line = lines[i];
       if (line === '') {
@@ -77,7 +103,7 @@ function MarkdownText({ text }: { text: string }) {
 }
 
 function renderInline(text: string): React.ReactNode {
-  const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
+  const parts = text.split(/(`[^`]+`|**[^*]+**)/g);
   return parts.map((part, idx) => {
     if (part.startsWith('`') && part.endsWith('`')) {
       return <code key={idx} className="bg-secondary/60 px-1.5 py-0.5 rounded text-xs font-mono">{part.slice(1, -1)}</code>;
@@ -105,9 +131,7 @@ export default function Chat() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/');
-    }
+    if (!isAuthenticated) { navigate('/'); }
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
@@ -117,10 +141,7 @@ export default function Chat() {
   const handleSend = async () => {
     const text = input.trim();
     if (!text || loading) return;
-    if (!canSendMessage()) {
-      setShowUpgrade(true);
-      return;
-    }
+    if (!canSendMessage()) { setShowUpgrade(true); return; }
     setInput('');
     setError('');
     const userMsg: ChatMessage = { role: 'user', content: text };
@@ -137,7 +158,7 @@ export default function Chat() {
       if (err.name === 'AbortError') return;
       const msg = err.message || 'Something went wrong';
       setError(msg);
-      setMessages([...nextMessages, { role: 'assistant', content: `⚠️ ${msg}` }]);
+      setMessages([...nextMessages, { role: 'assistant', content: msg }]);
     } finally {
       setLoading(false);
       abortRef.current = null;
@@ -146,10 +167,7 @@ export default function Chat() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
   const handleModeChange = (newMode: Mode) => {
@@ -164,6 +182,8 @@ export default function Chat() {
   return (
     <div className="flex flex-col h-screen bg-background">
       <Navbar />
+
+      {/* User + Mode bar */}
       <div className="border-b border-border/50 bg-card/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-2">
@@ -176,12 +196,31 @@ export default function Chat() {
             )}
             <span className="text-sm font-medium text-foreground">{user?.name || 'User'}</span>
           </div>
+
+          {/* Mode selector */}
+          <div className="flex items-center gap-1 ml-2">
+            {(Object.keys(MODE_CONFIG) as Mode[]).map((m) => (
+              <button
+                key={m}
+                onClick={() => handleModeChange(m)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors ${
+                  mode === m
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                }`}
+              >
+                <span>{MODE_CONFIG[m].icon}</span>
+                <span className="hidden sm:inline">{MODE_CONFIG[m].label}</span>
+              </button>
+            ))}
+          </div>
+
           <div className="ml-auto flex items-center gap-3">
             {!subscribed && (
               <div className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border ${
                 remaining === 0 ? 'text-red-400 border-red-400/30 bg-red-400/10'
-                  : remaining <= 2 ? 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10'
-                  : 'text-muted-foreground border-border/50'
+                : remaining <= 2 ? 'text-yellow-400 border-yellow-400/30 bg-yellow-400/10'
+                : 'text-muted-foreground border-border/50'
               }`}>
                 <Zap className="w-3 h-3" />
                 {remaining === 0 ? 'Free limit reached' : `${remaining}/${FREE_MESSAGE_LIMIT} free messages`}
@@ -195,6 +234,8 @@ export default function Chat() {
           </div>
         </div>
       </div>
+
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-4 py-6 flex flex-col gap-6">
           {messages.length === 0 && (
@@ -205,20 +246,29 @@ export default function Chat() {
               <p className="text-muted-foreground/60 text-sm mt-2">{currentMode.placeholder}</p>
             </div>
           )}
+
           {messages.map((msg, idx) => (
             <div key={idx} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
               <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                msg.role === 'user' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white' : 'bg-secondary border border-border/50 text-lg'
+                msg.role === 'user'
+                  ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'
+                  : 'bg-secondary border border-border/50 text-lg'
               }`}>
                 {msg.role === 'user' ? (user?.name?.[0]?.toUpperCase() || 'U') : currentMode.icon}
               </div>
               <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                msg.role === 'user' ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-tr-sm' : 'bg-card border border-border/50 rounded-tl-sm'
+                msg.role === 'user'
+                  ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-tr-sm'
+                  : 'bg-card border border-border/50 rounded-tl-sm'
               }`}>
-                {msg.role === 'assistant' ? <MarkdownText text={msg.content} /> : <p className="text-sm whitespace-pre-wrap">{msg.content}</p>}
+                {msg.role === 'assistant'
+                  ? <MarkdownText text={msg.content} />
+                  : <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                }
               </div>
             </div>
           ))}
+
           {loading && (
             <div className="flex gap-3">
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary border border-border/50 flex items-center justify-center text-lg">{currentMode.icon}</div>
@@ -231,6 +281,8 @@ export default function Chat() {
           <div ref={messagesEndRef} />
         </div>
       </div>
+
+      {/* Input area */}
       <div className="border-t border-border/50 bg-card/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-4 py-4">
           {!subscribed && remaining === 0 ? (
@@ -240,7 +292,7 @@ export default function Chat() {
                 <span className="text-foreground">Free messages used up. Upgrade to keep chatting.</span>
               </div>
               <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 ml-4" onClick={() => navigate('/pricing')}>
-                Upgrade — $15/mo
+                Upgrade &mdash; $15/mo
               </Button>
             </div>
           ) : (
@@ -254,7 +306,11 @@ export default function Chat() {
                 rows={1}
                 className="flex-1 resize-none min-h-[44px] max-h-40 bg-secondary/50 border-border/50 focus:border-primary rounded-xl py-3"
               />
-              <Button onClick={handleSend} disabled={loading || !input.trim()} className="h-11 w-11 p-0 bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0 rounded-xl">
+              <Button
+                onClick={handleSend}
+                disabled={loading || !input.trim()}
+                className="h-11 w-11 p-0 bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0 rounded-xl"
+              >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </Button>
             </div>
@@ -262,6 +318,8 @@ export default function Chat() {
           <p className="text-xs text-muted-foreground/50 mt-2 text-center">Press Enter to send · Shift+Enter for new line</p>
         </div>
       </div>
+
+      {/* Upgrade dialog */}
       <Dialog open={showUpgrade} onOpenChange={setShowUpgrade}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -279,7 +337,7 @@ export default function Chat() {
               ))}
             </ul>
             <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600" onClick={() => { setShowUpgrade(false); navigate('/pricing'); }}>
-              Get Started — $15/month
+              Get Started &mdash; $15/month
             </Button>
             <Button variant="ghost" className="w-full" onClick={() => setShowUpgrade(false)}>Maybe later</Button>
           </div>
