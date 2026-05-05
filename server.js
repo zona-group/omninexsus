@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 
+// ââ CORS for local dev ââ
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -17,15 +18,22 @@ app.use((req, res, next) => {
   next();
 });
 
+// ââ Claude API proxy ââ
 app.post('/api/chat', async (req, res) => {
   const apiKey = process.env.CLAUDE_API_KEY;
+
   if (!apiKey) {
-    return res.status(503).json({ error: 'API key not configured.' });
+    return res.status(503).json({
+      error: 'API key not configured. Set CLAUDE_API_KEY as an environment variable.',
+    });
   }
+
   const { messages, systemPrompt } = req.body;
+
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Invalid request: messages array required' });
   }
+
   try {
     const client = new Anthropic({ apiKey });
     const response = await client.messages.create({
@@ -34,6 +42,7 @@ app.post('/api/chat', async (req, res) => {
       system: systemPrompt || 'You are a helpful AI assistant.',
       messages: messages.map((m) => ({ role: m.role, content: m.content })),
     });
+
     const content = response.content[0]?.type === 'text' ? response.content[0].text : '';
     res.json({ content });
   } catch (err) {
@@ -42,48 +51,63 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
+// ââ Google OAuth ââ
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'https://www.omninexsus.com/api/auth/google/callback';
+
 app.get('/api/auth/google', (_req, res) => {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = process.env.APP_URL
-    ? `${process.env.APP_URL}/api/auth/google/callback`
-    : 'https://www.omninexsus.com/api/auth/google/callback';
-  const scope = 'openid email profile';
-  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&access_type=offline`;
-  res.redirect(url);
+  if (!GOOGLE_CLIENT_ID) {
+    return res.status(503).send('Google OAuth not configured (missing GOOGLE_CLIENT_ID).');
+  }
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: GOOGLE_REDIRECT_URI,
+    response_type: 'code',
+    scope: 'openid email profile',
+    access_type: 'online',
+    prompt: 'select_account',
+  });
+  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
 
 app.get('/api/auth/google/callback', async (req, res) => {
-  const { code } = req.query;
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri = process.env.APP_URL
-    ? `${process.env.APP_URL}/api/auth/google/callback`
-    : 'https://www.omninexsus.com/api/auth/google/callback';
+  const { code, error } = req.query;
+  if (error || !code) {
+    return res.redirect('/?error=google_auth_failed');
+  }
   try {
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, client_id: clientId, client_secret: clientSecret, redirect_uri: redirectUri, grant_type: 'authorization_code' }),
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code',
+      }),
     });
     const tokens = await tokenRes.json();
-    const idToken = tokens.id_token;
-    const payload = JSON.parse(Buffer.from(idToken.split('.')[1], 'base64url').toString());
-    const user = {
-      id: `google_${payload.sub}`,
-      email: payload.email,
-      name: payload.name || payload.email.split('@')[0],
-      avatar: payload.picture || '',
-      createdAt: new Date().toISOString(),
-      preferences: { mode: 'developer', theme: 'dark', language: 'en', notifications: true },
+    if (!tokens.access_token) throw new Error('No access token received');
+    const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    });
+    const profile = await profileRes.json();
+    const userData = {
+      email: profile.email || '',
+      name: profile.name || profile.email?.split('@')[0] || 'User',
+      avatar: profile.picture || '',
     };
-    const userData = Buffer.from(JSON.stringify(user)).toString('base64url');
-    res.redirect(`/auth/callback?user=${userData}`);
+    const encoded = encodeURIComponent(JSON.stringify(userData));
+    res.redirect(`/auth/callback?user=${encoded}`);
   } catch (err) {
     console.error('Google OAuth error:', err.message);
-    res.redirect('/login?error=google_failed');
+    res.redirect('/?error=google_auth_error');
   }
 });
 
+// ââ Health check ââ
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
 const distPath = path.join(__dirname, 'dist');
@@ -95,6 +119,6 @@ app.get('*', (_req, res) => {
 app.listen(PORT, () => {
   console.log(`OmniNexus server running on port ${PORT}`);
   if (!process.env.CLAUDE_API_KEY) {
-    console.warn('⚠  CLAUDE_API_KEY is not set — /api/chat will return 503');
+    console.warn('â¢'WARN: CLAUDE_API_KEY not set');
   }
 });
