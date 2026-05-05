@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 
-// ââ CORS for local dev ââ
+// CORS for local dev
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ââ Claude API proxy ââ
+// Claude API proxy
 app.post('/api/chat', async (req, res) => {
   const apiKey = process.env.CLAUDE_API_KEY;
 
@@ -51,7 +51,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// ââ Google OAuth ââ
+// Google OAuth
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || 'https://www.omninexsus.com/api/auth/google/callback';
@@ -68,7 +68,7 @@ app.get('/api/auth/google', (_req, res) => {
     access_type: 'online',
     prompt: 'select_account',
   });
-  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+  res.redirect('https://accounts.google.com/o/oauth2/v2/auth?' + params);
 });
 
 app.get('/api/auth/google/callback', async (req, res) => {
@@ -90,26 +90,29 @@ app.get('/api/auth/google/callback', async (req, res) => {
     });
     const tokens = await tokenRes.json();
     if (!tokens.access_token) throw new Error('No access token received');
+
     const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${tokens.access_token}` },
+      headers: { Authorization: 'Bearer ' + tokens.access_token },
     });
     const profile = await profileRes.json();
+
     const userData = {
       email: profile.email || '',
-      name: profile.name || profile.email?.split('@')[0] || 'User',
+      name: profile.name || (profile.email ? profile.email.split('@')[0] : 'User'),
       avatar: profile.picture || '',
     };
     const encoded = encodeURIComponent(JSON.stringify(userData));
-    res.redirect(`/auth/callback?user=${encoded}`);
+    res.redirect('/auth/callback?user=' + encoded);
   } catch (err) {
     console.error('Google OAuth error:', err.message);
     res.redirect('/?error=google_auth_error');
   }
 });
 
-// ââ Health check ââ
+// Health check
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
+// Serve React build in production
 const distPath = path.join(__dirname, 'dist');
 app.use(express.static(distPath));
 app.get('*', (_req, res) => {
@@ -117,8 +120,8 @@ app.get('*', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`OmniNexus server running on port ${PORT}`);
+  console.log('OmniNexus server running on port ' + PORT);
   if (!process.env.CLAUDE_API_KEY) {
-    console.warn('â¢'WARN: CLAUDE_API_KEY not set');
+    console.warn('WARNING: CLAUDE_API_KEY is not set - /api/chat will return 503');
   }
 });
