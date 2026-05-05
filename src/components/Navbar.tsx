@@ -51,17 +51,11 @@ export default function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
 
           {/* Center Nav Links */}
           <div className="hidden md:flex items-center gap-1">
-            <Link
-              to="/chat"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
-            >
+            <Link to="/chat" className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
               <MessageSquare className="w-4 h-4" />
               Chat
             </Link>
-            <Link
-              to="/pricing"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
-            >
+            <Link to="/pricing" className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors">
               <DollarSign className="w-4 h-4" />
               Pricing
             </Link>
@@ -81,11 +75,11 @@ export default function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 overflow-hidden">
                       <img
                         src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=6366f1&color=fff`}
                         alt={user?.name}
-                        className="h-8 w-8 rounded-full object-cover"
+                        className="h-full w-full rounded-full object-cover"
                       />
                     </Button>
                   </DropdownMenuTrigger>
@@ -113,22 +107,14 @@ export default function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
               </div>
             ) : (
               <div className="hidden sm:flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={openLogin}>
-                  Login
-                </Button>
+                <Button variant="ghost" size="sm" onClick={openLogin}>Login</Button>
                 <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600" onClick={openRegister}>
                   Sign Up Free
                 </Button>
               </div>
             )}
-
             {/* Mobile Menu Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
@@ -157,7 +143,7 @@ export default function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
         )}
       </div>
 
-      {/* Inline Login Modal (fallback when no onLoginClick prop) */}
+      {/* Inline Login Modal */}
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -189,7 +175,8 @@ function LoginForm({ onClose, onRegisterClick }: { onClose: () => void; onRegist
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     const ok = await login(email, password);
     if (ok) { onClose(); navigate('/chat'); }
     else setError('Invalid email or password');
@@ -238,7 +225,8 @@ function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginC
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true); setError('');
+    setLoading(true);
+    setError('');
     const ok = await register(email, password, name);
     if (ok) { onClose(); navigate('/chat'); }
     else setError('email_exists');
@@ -251,7 +239,7 @@ function RegisterForm({ onClose, onLoginClick }: { onClose: () => void; onLoginC
         <div className="rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 text-center">
           <p className="text-sm text-amber-600 dark:text-amber-400">This email is already registered.</p>
           <button type="button" onClick={onLoginClick} className="text-sm text-primary hover:underline font-medium mt-1">
-            Login with this email instead →
+            Login with this email instead &rarr;
           </button>
         </div>
       ) : error ? (
